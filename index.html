@@ -35,10 +35,14 @@ body {
 }
 
 header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
     background: var(--navy);
     color: white;
     padding: 20px;
 }
+
 
 .header-inner {
     max-width: 1200px;
@@ -406,6 +410,181 @@ dialog::backdrop {
         <p id="login-message" class="message"></p>
     </div>
 </div>
+<div
+    id="company-window"
+    class="hidden"
+    style="
+        position:fixed;
+        inset:0;
+        z-index:30;
+        background:#0b1726cc;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        padding:20px;
+    "
+>
+    <div
+        style="
+            background:#ffffff;
+            width:min(420px,100%);
+            border-radius:15px;
+            padding:24px;
+            box-shadow:0 20px 70px #0005;
+        "
+    >
+        <h2 style="margin-top:0;color:#17324d;">
+            إنشاء شركة جديدة
+        </h2>
+
+        <p style="color:#6b7280;font-size:.85rem;">
+            اكتب اسم الشركة التي تريد إنشاءها.
+        </p>
+
+        <label for="new-company-name">
+            اسم الشركة
+        </label>
+
+        <input
+            id="new-company-name"
+            type="text"
+            placeholder="مثال: شركة النور"
+        >
+
+        <div
+            style="
+                display:flex;
+                gap:8px;
+                margin-top:14px;
+            "
+        >
+            <button
+                id="save-company-button"
+                class="primary-button"
+                type="button"
+            >
+                متابعة
+            </button>
+
+            <button
+                id="close-company-button"
+                class="secondary-button"
+                type="button"
+            >
+                إغلاق
+            </button>
+        </div>
+
+        <p
+            id="company-window-message"
+            class="message"
+        ></p>
+    </div>
+</div>
+<div
+    id="employees-window"
+    class="hidden"
+    style="
+        position:fixed;
+        inset:0;
+        z-index:30;
+        background:#0b1726cc;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        padding:20px;
+    "
+>
+    <div
+        style="
+            background:#ffffff;
+            width:min(460px,100%);
+            max-height:90vh;
+            overflow:auto;
+            border-radius:15px;
+            padding:24px;
+            box-shadow:0 20px 70px #0005;
+        "
+    >
+        <h2 style="margin-top:0;color:#17324d;">
+            إدارة الموظفين
+        </h2>
+
+        <p style="color:#6b7280;font-size:.85rem;">
+            أضف مستخدمًا موجودًا في النظام إلى شركتك.
+        </p>
+
+        <label for="employee-email">
+            البريد الإلكتروني
+        </label>
+
+        <input
+            id="employee-email"
+            type="email"
+            placeholder="employee@example.com"
+        >
+
+        <label for="employee-role">
+            الصلاحية
+        </label>
+
+        <select id="employee-role">
+            <option value="member">
+                موظف
+            </option>
+
+            <option value="admin">
+                مدير
+            </option>
+        </select>
+
+        <div
+            style="
+                display:flex;
+                gap:8px;
+                margin-top:14px;
+            "
+        >
+            <button
+                id="add-employee-button"
+                class="primary-button"
+                type="button"
+            >
+                إضافة الموظف
+            </button>
+
+            <button
+                id="close-employees-button"
+                class="secondary-button"
+                type="button"
+            >
+                إغلاق
+            </button>
+        </div>
+<div
+    id="employees-list"
+    style="
+        margin-top:20px;
+        border-top:1px solid #e5e7eb;
+        padding-top:14px;
+    "
+>
+    <div
+        style="
+            color:#6b7280;
+            font-size:.85rem;
+        "
+    >
+        لم يتم تحميل الموظفين بعد.
+    </div>
+</div>
+
+        <p
+            id="employees-window-message"
+            class="message"
+        ></p>
+    </div>
+</div>
 
 <header>
     <div class="header-inner">
@@ -415,23 +594,57 @@ dialog::backdrop {
         </div>
 
         <div>
-            <span id="connection">جاري الاتصال...</span>
-              
+    <span id="connection">جاري الاتصال...</span>
+<br>
 
-            <button
-                id="logout-button"
-                class="secondary-button hidden"
-                onclick="logoutUser()">
-                خروج
-            </button>
-        </div>
+<span
+    id="company-name"
+    style="
+        color:#dbeafe;
+        font-size:.75rem;
+        font-weight:bold;
+    "
+></span>
+
+<br>
+
+<span
+    id="company-role"
+    style="
+        color:#bfdbfe;
+        font-size:.7rem;
+    "
+></span>
+
+    <button
+        id="create-company-button"
+        class="secondary-button"
+        type="button">
+        إنشاء شركة
+    </button>
+<button
+    id="manage-employees-button"
+    class="secondary-button"
+    type="button">
+    إدارة الموظفين
+</button>
+
+    <button
+        id="logout-button"
+        class="secondary-button hidden"
+        onclick="logoutUser()">
+        خروج
+    </button>
+</div>
+
     </div>
 </header>
 
 <main class="container">
 
 <!-- إدخال مستند -->
-<section class="panel">
+<section id="input-panel" class="panel">
+
     <h2>إدخال مستند جديد</h2>
 
     <div class="form-grid">
@@ -667,6 +880,14 @@ const db = supabase.createClient(
 let currentPage = 0;
 let totalDocuments = 0;
 let currentDocuments = [];
+let currentOrganizationId = null;
+let currentOrganizationRole = null;
+let currentCanDelete = false;
+
+let editingDocumentId = null;
+
+
+
 
 const $ = id => document.getElementById(id);
 
@@ -744,8 +965,154 @@ async function loginUser() {
         .getElementById("logout-button")
         .classList.remove("hidden");
 
+    try {
+    const organizationId =
+        await loadMyOrganization();
+if (organizationId) {
+    await loadMyOrganizationName();
+    await loadMyOrganizationRole();
+    await loadMyDeletePermission();
+}
+
+
+
+    if (!organizationId) {
+        document
+            .getElementById("company-window")
+            .classList.remove("hidden");
+
+        message.style.color = "#a76500";
+        message.textContent =
+            "أنشئ شركتك للمتابعة";
+
+        return;
+    }
+
     await loadFilters();
     await loadDocuments();
+
+} catch (error) {
+    message.style.color = "var(--red)";
+    message.textContent =
+        error.message;
+
+    await db.auth.signOut();
+
+    document
+        .getElementById("login-screen")
+        .classList.remove("hidden");
+
+    document
+        .getElementById("logout-button")
+        .classList.add("hidden");
+}
+
+
+}
+async function loadMyOrganization() {
+
+    const result = await db.rpc(
+        "get_my_organization_id"
+    );
+
+    if (result.error) {
+        console.error(result.error);
+
+        currentOrganizationId = null;
+
+        throw new Error(
+            "تعذر معرفة الشركة المرتبط بها المستخدم"
+        );
+    }
+
+    currentOrganizationId = result.data;
+
+    if (!currentOrganizationId) {
+    return null;
+}
+
+
+    return currentOrganizationId;
+}
+async function loadMyOrganizationName() {
+    const result =
+        await db.rpc(
+            "get_my_organization_name"
+        );
+
+    if (result.error) {
+        console.error(result.error);
+        return;
+    }
+
+    const companyName =
+        document.getElementById(
+            "company-name"
+        );
+
+    if (companyName && result.data) {
+        companyName.textContent =
+            "الشركة: " + result.data;
+    }
+}
+async function loadMyOrganizationRole() {
+    const result =
+        await db.rpc(
+            "get_my_organization_role"
+        );
+
+    if (result.error) {
+        console.error(result.error);
+        return null;
+    }
+
+    currentOrganizationRole =
+        result.data || null;
+
+    const roleElement =
+        document.getElementById(
+            "company-role"
+        );
+
+    if (roleElement) {
+        const roleNames = {
+            owner: "مالك الشركة",
+            admin: "مدير",
+            member: "موظف"
+        };
+
+        roleElement.textContent =
+            currentOrganizationRole
+                ? "الصلاحية: " +
+                  (
+                    roleNames[
+                        currentOrganizationRole
+                    ] ||
+                    currentOrganizationRole
+                  )
+                : "";
+    }
+
+    return currentOrganizationRole;
+}
+async function loadMyDeletePermission() {
+    const result =
+        await db.rpc(
+            "get_my_delete_permission"
+        );
+
+    if (result.error) {
+        console.error(result.error);
+        currentCanDelete = false;
+        return false;
+    }
+
+    currentCanDelete =
+    result.data === true ||
+    result.data === "true";
+
+
+    return currentCanDelete;
 }
 
 /* تسجيل الخروج */
@@ -941,6 +1308,94 @@ async function loadFilters() {
     $("connection").textContent =
         "متصل بالمستندات";
 }
+async function deleteDocument(documentId) {
+  const normalizedRole =
+    String(
+        currentOrganizationRole || ""
+    )
+        .trim()
+        .toLowerCase();
+
+const normalizedCanDelete =
+    currentCanDelete === true ||
+    String(currentCanDelete)
+        .trim()
+        .toLowerCase() === "true";
+
+if (
+    normalizedRole !== "owner" &&
+    normalizedRole !== "admin" &&
+    !normalizedCanDelete
+) {
+    alert(
+        "ليس لديك صلاحية حذف المستندات"
+    );
+
+    return;
+}
+
+
+
+    const record =
+        currentDocuments.find(
+            row => String(row.id) === String(documentId)
+        );
+
+    
+
+
+    const documentName =
+        record.document_number ||
+        record.document_type ||
+        "هذا المستند";
+
+    const confirmed =
+        window.confirm(
+            `هل أنت متأكد من حذف ${documentName}؟\n\nلا يمكن التراجع عن الحذف.`
+        );
+
+    if (!confirmed) {
+        return;
+    }
+
+   const result =
+    await db
+        .from("business_documents")
+        .delete()
+        .eq("id", documentId)
+        .eq(
+            "organization_id",
+            currentOrganizationId
+        );
+
+
+
+    if (result.error) {
+    console.error(result.error);
+
+    alert(
+        "فشل الحذف: " +
+        result.error.message
+    );
+
+    return;
+}
+
+
+
+alert("تم حذف المستند بنجاح");
+
+    await loadFilters();
+
+    if (
+        currentDocuments.length === 1 &&
+        currentPage > 0
+    ) {
+        currentPage--;
+    }
+
+    await loadDocuments();
+}
 
 /* عرض البطاقات */
 function renderCards() {
@@ -969,6 +1424,13 @@ function renderCards() {
                         document.created_at
                       ).toLocaleString("ar-EG")
                     : "—";
+const updatedTime =
+    document.updated_at
+        ? new Date(
+            document.updated_at
+          ).toLocaleString("ar-EG")
+        : createdTime;
+
 
             const itemsCount =
                 Array.isArray(document.items)
@@ -1015,6 +1477,18 @@ function renderCards() {
                             <span>وقت التسجيل من Supabase</span>
                             ${escapeHtml(createdTime)}
                         </div>
+<div
+    style="
+        grid-column:1 / -1;
+        color:#6b7280;
+        font-size:.68rem;
+        text-align:right;
+    "
+>
+    آخر تعديل:
+    ${escapeHtml(updatedTime)}
+</div>
+
 
                         <div>
                             <span>القيمة</span>
@@ -1042,23 +1516,153 @@ function renderCards() {
                     </div>
 
                     <button
-                        class="details-button"
-                        onclick="openDetails('${document.id}')">
-                        فتح التفاصيل
-                    </button>
+    class="details-button"
+    onclick="openDetails('${document.id}')">
+    فتح التفاصيل
+</button>
+
+<button
+    type="button"
+    class="edit-document-button"
+    onclick="startEditDocument('${document.id}')"
+    style="
+        width:100%;
+        margin-top:8px;
+        padding:10px;
+        border:0;
+        border-radius:8px;
+        background:#e8f5ef;
+        color:#16845b;
+        cursor:pointer;
+    "
+>
+    تعديل المستند
+</button>
+
+
+
+${
+    currentOrganizationRole === "owner" ||
+currentOrganizationRole === "admin" ||
+currentCanDelete === true
+
+        ? `
+            <button
+                type="button"
+                class="delete-document-button"
+                onclick="deleteDocument('${document.id}')"
+                style="
+                    width:100%;
+                    margin-top:8px;
+                    padding:10px;
+                    border:0;
+                    border-radius:8px;
+                    background:#fbe9e7;
+                    color:#b42318;
+                    cursor:pointer;
+                "
+            >
+                حذف المستند
+            </button>
+          `
+        : ""
+}
+
+
 
                 </article>
             `;
         }).join("");
 }
+function startEditDocument(documentId) {
+    const record =
+        currentDocuments.find(
+            row => String(row.id) === String(documentId)
+        );
+
+    if (!record) {
+        return;
+    }
+
+    editingDocumentId =
+        record.id;
+
+    $("document-type").value =
+        record.document_type || "فاتورة";
+
+    $("document-number").value =
+        record.document_number || "";
+
+    $("entity-name").value =
+        record.entity_name || "";
+
+    $("document-status").value =
+        record.status || "مفتوح";
+
+    $("amount").value =
+        record.amount ?? "";
+
+    $("period-from").value =
+        record.period_from || "";
+
+    $("period-to").value =
+        record.period_to || "";
+
+    $("source-url").value =
+        record.source_url || "";
+
+    $("notes").value =
+        record.notes || "";
+
+    const firstItem =
+        Array.isArray(record.items)
+            ? record.items[0]
+            : null;
+
+    $("item-name").value =
+        firstItem?.name || "";
+
+    $("item-quantity").value =
+        firstItem?.quantity ?? 1;
+
+    $("item-price").value =
+        firstItem?.price ?? 0;
+
+    $("form-message").style.color =
+        "var(--orange)";
+
+    $("form-message").textContent =
+        "تم تحميل المستند للتعديل";
+
+    const inputPanel =
+        document.getElementById(
+            "input-panel"
+        );
+
+    if (inputPanel) {
+        inputPanel.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+    }
+}
+
 
 /* حفظ مستند */
 async function saveDocument() {
     const entity =
-        $("entity-name").value.trim();
+    $("entity-name").value.trim();
 
-    const message =
-        $("form-message");
+const message =
+    $("form-message");
+
+if (!currentOrganizationId) {
+    message.style.color = "var(--red)";
+    message.textContent =
+        "لا توجد شركة مرتبطة بهذا المستخدم";
+    return;
+}
+
 
     if (!entity) {
         message.style.color = "var(--red)";
@@ -1082,6 +1686,8 @@ async function saveDocument() {
             : Number($("amount").value);
 
     const data = {
+        organization_id:
+    currentOrganizationId,
         document_type:
             $("document-type").value,
 
@@ -1129,10 +1735,25 @@ async function saveDocument() {
     message.style.color = "var(--orange)";
     message.textContent = "جاري الحفظ...";
 
-    const result =
+    let result;
+
+if (editingDocumentId) {
+    result =
+        await db
+            .from("business_documents")
+            .update(data)
+            .eq("id", editingDocumentId)
+            .eq(
+                "organization_id",
+                currentOrganizationId
+            );
+} else {
+    result =
         await db
             .from("business_documents")
             .insert(data);
+}
+
 
     if (result.error) {
         message.style.color = "var(--red)";
@@ -1141,13 +1762,19 @@ async function saveDocument() {
         return;
     }
 
-    message.style.color = "var(--green)";
     message.textContent =
-        "تم حفظ المستند بنجاح";
+    editingDocumentId
+        ? "تم تعديل المستند "
+        : "تم حفظ المستند بنجاح";
+
+
+    editingDocumentId =
+    null;
 
     clearForm();
 
     await loadFilters();
+
     currentPage = 0;
     await loadDocuments();
 }
@@ -1352,9 +1979,9 @@ $("search-text").addEventListener(
 $("page-size").addEventListener(
     "change",
     () => {
-        currentPage = 0;
-        loadDocuments();
-    }
+    currentPage = 0;
+    loadDocuments();
+}
 );
 
 /* بدء النظام */
@@ -1362,16 +1989,541 @@ async function startApplication() {
     const session =
         await db.auth.getSession();
 
-    if (session.data.session) {
-        $("login-screen").classList.add("hidden");
-        $("logout-button").classList.remove("hidden");
-
-        await loadFilters();
-        await loadDocuments();
-    } else {
+    if (!session.data.session) {
         $("connection").textContent =
             "يجب تسجيل الدخول";
+
+        return;
     }
+
+    $("login-screen")
+        .classList.add("hidden");
+
+    $("logout-button")
+        .classList.remove("hidden");
+
+    try {
+        const organizationId =
+    await loadMyOrganization();
+
+if (organizationId) {
+    await loadMyOrganizationName();
+    await loadMyOrganizationRole();
+    await loadMyDeletePermission();
+
+    await loadFilters();
+    await loadDocuments();
+}
+else {
+    document
+        .getElementById("company-window")
+        .classList.remove("hidden");
+}
+
+
+    } catch (error) {
+        console.error(error);
+
+        $("connection").textContent =
+            error.message;
+
+        await db.auth.signOut();
+
+        $("login-screen")
+            .classList.remove("hidden");
+
+        $("logout-button")
+            .classList.add("hidden");
+    }
+}
+const createCompanyButton =
+    document.getElementById(
+        "create-company-button"
+    );
+
+const companyWindow =
+    document.getElementById(
+        "company-window"
+    );
+
+const closeCompanyButton =
+    document.getElementById(
+        "close-company-button"
+    );
+
+if (createCompanyButton) {
+    createCompanyButton.addEventListener(
+        "click",
+        function () {
+            companyWindow.classList.remove(
+                "hidden"
+            );
+
+            document
+                .getElementById(
+                    "new-company-name"
+                )
+                .focus();
+        }
+    );
+}
+
+if (closeCompanyButton) {
+    closeCompanyButton.addEventListener(
+        "click",
+        function () {
+            companyWindow.classList.add(
+                "hidden"
+            );
+        }
+    );
+}
+const saveCompanyButton =
+    document.getElementById(
+        "save-company-button"
+    );
+
+if (saveCompanyButton) {
+    saveCompanyButton.addEventListener(
+        "click",
+        async function () {
+            const nameInput =
+                document.getElementById(
+                    "new-company-name"
+                );
+
+            const message =
+                document.getElementById(
+                    "company-window-message"
+                );
+
+            const name =
+                nameInput.value.trim();
+
+            if (name.length < 2) {
+                message.style.color =
+                    "#b42318";
+
+                message.textContent =
+                    "اكتب اسم شركة صحيح";
+
+                nameInput.focus();
+
+                return;
+            }
+
+            saveCompanyButton.disabled =
+                true;
+
+            message.style.color =
+                "#a76500";
+
+            message.textContent =
+                "جاري إنشاء الشركة...";
+
+            const result =
+                await db.rpc(
+                    "create_my_organization",
+                    {
+                        p_name: name
+                    }
+                );
+
+            saveCompanyButton.disabled =
+                false;
+
+            if (result.error) {
+                console.error(result.error);
+
+                message.style.color =
+                    "#b42318";
+
+                message.textContent =
+                    result.error.message;
+
+                return;
+            }
+
+            currentOrganizationId =
+                result.data;
+await loadMyOrganizationName();
+await loadMyOrganizationRole();
+
+document.getElementById(
+    "company-name"
+).textContent =
+    "الشركة: " + name;
+
+
+            message.style.color =
+                "#16845b";
+
+            message.textContent =
+                "تم إنشاء الشركة بنجاح";
+
+            document.getElementById(
+                "connection"
+            ).textContent =
+                "متصل بالشركة: " + name;
+
+            setTimeout(
+                async function () {
+                    companyWindow.classList.add(
+                        "hidden"
+                    );
+
+                    nameInput.value = "";
+                    message.textContent = "";
+
+                    await loadFilters();
+                    await loadDocuments();
+                },
+                700
+            );
+        }
+    );
+}
+async function loadOrganizationMembers() {
+    const list =
+        document.getElementById(
+            "employees-list"
+        );
+
+    if (!list) {
+        return;
+    }
+
+    list.innerHTML =
+        "جاري تحميل الموظفين...";
+
+    const result =
+        await db.rpc(
+            "list_my_organization_members"
+        );
+
+    if (result.error) {
+        console.error(result.error);
+
+        list.innerHTML =
+            `<div style="color:#b42318;">
+                فشل تحميل قائمة الموظفين
+             </div>`;
+
+        return;
+    }
+
+    if (
+        !result.data ||
+        result.data.length === 0
+    ) {
+        list.innerHTML =
+            `<div style="color:#6b7280;">
+                لا يوجد أعضاء في الشركة.
+             </div>`;
+
+        return;
+    }
+
+    list.innerHTML =
+        result.data.map(member => `
+            <div
+                style="
+                    padding:10px 0;
+                    border-bottom:1px solid #e5e7eb;
+                    display:flex;
+                    justify-content:space-between;
+                    gap:10px;
+                    font-size:.85rem;
+                "
+            >
+                <span>
+                    ${escapeHtml(
+                        member.member_email
+                    )}
+                </span>
+
+                
+    <div style="text-align:left;">
+    <b style="color:#17324d;">
+        ${
+            member.member_role === "owner"
+                ? "مالك الشركة"
+                : member.member_role === "admin"
+                    ? "مدير"
+                    : "موظف"
+        }
+    </b>
+
+    ${
+        member.member_role === "member"
+            ? `
+                <label
+                    style="
+                        display:block;
+                        margin-top:6px;
+                        font-size:.72rem;
+                        color:#6b7280;
+                        cursor:pointer;
+                    "
+                >
+                    <input
+                        type="checkbox"
+                        class="member-delete-permission"
+                        data-member-id="${member.member_user_id}"
+                        ${
+                            member.member_can_delete
+                                ? "checked"
+                                : ""
+                        }
+                    >
+                    السماح بالحذف
+                </label>
+              `
+            : ""
+    }
+</div>
+
+
+    ${
+        member.member_role === "member"
+            ? `
+                <label
+                    style="
+                        display:block;
+                        margin-top:6px;
+                        font-size:.72rem;
+                        color:#6b7280;
+                        cursor:pointer;
+                    "
+                >
+                    <input
+                        type="checkbox"
+                        class="member-delete-permission"
+                        data-member-id="${member.member_user_id}"
+                        ${
+                            member.member_can_delete
+
+                                ? "checked"
+                                : ""
+                        }
+                    >
+                    السماح بالحذف
+                </label>
+              `
+            : ""
+    }
+</div>
+
+            </div>
+        `).join("");
+document
+    .querySelectorAll(
+        ".member-delete-permission"
+    )
+    .forEach(function (checkbox) {
+        checkbox.addEventListener(
+            "change",
+            async function () {
+                const memberId =
+                    checkbox.dataset.memberId;
+
+                const newValue =
+                    checkbox.checked;
+
+                checkbox.disabled =
+                    true;
+
+                const result =
+                    await db.rpc(
+                        "set_member_delete_permission",
+                        {
+                            p_member_user_id:
+                                memberId,
+                            p_can_delete:
+                                newValue
+                        }
+                    );
+
+                checkbox.disabled =
+                    false;
+
+                if (result.error) {
+                    console.error(
+                        result.error
+                    );
+
+                    checkbox.checked =
+                        !newValue;
+
+                    alert(
+                        "فشل تغيير صلاحية الحذف: " +
+                        result.error.message
+                    );
+
+                    return;
+                }
+
+                alert(
+                    newValue
+                        ? "تم منح الموظف صلاحية الحذف"
+                        : "تم إلغاء صلاحية الحذف"
+                );
+            }
+        );
+    });
+
+}
+
+const manageEmployeesButton =
+    document.getElementById(
+        "manage-employees-button"
+    );
+
+const employeesWindow =
+    document.getElementById(
+        "employees-window"
+    );
+
+const closeEmployeesButton =
+    document.getElementById(
+        "close-employees-button"
+    );
+
+if (manageEmployeesButton) {
+    manageEmployeesButton.addEventListener(
+    "click",
+    async function () {
+
+            if (
+                currentOrganizationRole !== "owner" &&
+                currentOrganizationRole !== "admin"
+            ) {
+                alert(
+                    "ليس لديك صلاحية إدارة الموظفين"
+                );
+
+                return;
+            }
+
+            employeesWindow.classList.remove(
+                "hidden"
+            );
+await loadOrganizationMembers();
+
+        }
+    );
+}
+
+if (closeEmployeesButton) {
+    closeEmployeesButton.addEventListener(
+        "click",
+        function () {
+            employeesWindow.classList.add(
+                "hidden"
+            );
+        }
+    );
+}
+const addEmployeeButton =
+    document.getElementById(
+        "add-employee-button"
+    );
+
+if (addEmployeeButton) {
+    addEmployeeButton.addEventListener(
+        "click",
+        async function () {
+            const emailInput =
+                document.getElementById(
+                    "employee-email"
+                );
+
+            const roleInput =
+                document.getElementById(
+                    "employee-role"
+                );
+
+            const message =
+                document.getElementById(
+                    "employees-window-message"
+                );
+
+            const email =
+                emailInput.value.trim();
+
+            const role =
+                roleInput.value;
+
+            if (
+                currentOrganizationRole !== "owner" &&
+                currentOrganizationRole !== "admin"
+            ) {
+                message.style.color =
+                    "#b42318";
+
+                message.textContent =
+                    "ليس لديك صلاحية إضافة موظفين";
+
+                return;
+            }
+
+            if (!email) {
+                message.style.color =
+                    "#b42318";
+
+                message.textContent =
+                    "اكتب البريد الإلكتروني للموظف";
+
+                emailInput.focus();
+
+                return;
+            }
+
+            addEmployeeButton.disabled =
+                true;
+
+            message.style.color =
+                "#a76500";
+
+            message.textContent =
+                "جاري إضافة الموظف...";
+
+            const result =
+                await db.rpc(
+                    "add_existing_employee",
+                    {
+                        p_email: email,
+                        p_role: role
+                    }
+                );
+
+            addEmployeeButton.disabled =
+                false;
+
+            if (result.error) {
+                console.error(result.error);
+
+                message.style.color =
+                    "#b42318";
+
+                message.textContent =
+                    result.error.message;
+
+                return;
+            }
+
+            message.style.color =
+                "#16845b";
+
+            message.textContent =
+                "تمت إضافة الموظف بنجاح";
+
+            emailInput.value = "";
+            roleInput.value = "member";
+await loadOrganizationMembers();
+
+        }
+    );
 }
 
 startApplication();
