@@ -400,15 +400,193 @@ dialog::backdrop {
         <input id="login-password" type="password">
 
         <button
-            class="primary-button"
-            style="width:100%;"
-            onclick="loginUser()">
-            دخول
-        </button>
+    class="primary-button"
+    style="width:100%;"
+    onclick="loginUser()">
+    دخول
+</button>
+
+<div
+    style="
+        display:flex;
+        justify-content:space-between;
+        gap:8px;
+        margin-top:12px;
+        flex-wrap:wrap;
+    "
+>
+    <button
+        type="button"
+        class="secondary-button"
+        style="flex:1; font-size:.82rem;"
+        onclick="openSignupWindow()"
+    >
+        إنشاء حساب
+    </button>
+
+    <button
+        type="button"
+        class="secondary-button"
+        style="flex:1; font-size:.82rem;"
+        onclick="openPasswordRecoveryWindow()"
+    >
+        نسيت كلمة المرور؟
+    </button>
+</div>
+
+<p id="login-message" class="message"></p>
+
 
         <p id="login-message" class="message"></p>
     </div>
 </div>
+<div
+    id="signup-window"
+    class="hidden"
+    style="
+        position:fixed;
+        inset:0;
+        z-index:40;
+        background:#0b1726cc;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        padding:20px;
+    "
+>
+    <div
+        style="
+            background:#ffffff;
+            width:min(420px,100%);
+            border-radius:15px;
+            padding:24px;
+            box-shadow:0 20px 70px #0005;
+        "
+    >
+        <h2 style="margin-top:0;color:#17324d;">
+            إنشاء حساب جديد
+        </h2>
+
+        <label for="signup-email">
+            البريد الإلكتروني
+        </label>
+
+        <input
+            id="signup-email"
+            type="email"
+            placeholder="name@gmail.com"
+        >
+
+        <label for="signup-password">
+            كلمة المرور
+        </label>
+
+        <input
+            id="signup-password"
+            type="password"
+            placeholder="6 أحرف أو أكثر"
+        >
+
+        <label for="signup-password-confirm">
+            تأكيد كلمة المرور
+        </label>
+
+        <input
+            id="signup-password-confirm"
+            type="password"
+            placeholder="أعد كتابة كلمة المرور"
+        >
+
+        <button
+            class="primary-button"
+            style="width:100%;margin-top:10px;"
+            type="button"
+            onclick="signUpUser()"
+        >
+            إنشاء الحساب
+        </button>
+
+        <button
+            class="secondary-button"
+            style="width:100%;margin-top:10px;"
+            type="button"
+            onclick="closeSignupWindow()"
+        >
+            رجوع
+        </button>
+
+        <p
+            id="signup-message"
+            class="message"
+        ></p>
+    </div>
+</div>
+<div
+    id="recovery-window"
+    class="hidden"
+    style="
+        position:fixed;
+        inset:0;
+        z-index:40;
+        background:#0b1726cc;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        padding:20px;
+    "
+>
+    <div
+        style="
+            background:#ffffff;
+            width:min(420px,100%);
+            border-radius:15px;
+            padding:24px;
+            box-shadow:0 20px 70px #0005;
+        "
+    >
+        <h2 style="margin-top:0;color:#17324d;">
+            استعادة كلمة المرور
+        </h2>
+
+        <p style="color:#6b7280;font-size:.85rem;">
+            اكتب بريدك الإلكتروني وسنرسل لك رابطًا لتعيين كلمة مرور جديدة.
+        </p>
+
+        <label for="recovery-email">
+            البريد الإلكتروني
+        </label>
+
+        <input
+            id="recovery-email"
+            type="email"
+            placeholder="name@gmail.com"
+        >
+
+        <button
+            class="primary-button"
+            style="width:100%;margin-top:10px;"
+            type="button"
+            onclick="sendPasswordRecovery()"
+        >
+            إرسال رابط الاستعادة
+        </button>
+
+        <button
+            class="secondary-button"
+            style="width:100%;margin-top:10px;"
+            type="button"
+            onclick="closePasswordRecoveryWindow()"
+        >
+            رجوع
+        </button>
+
+        <p
+            id="recovery-message"
+            class="message"
+        ></p>
+    </div>
+</div>
+
 <div
     id="company-window"
     class="hidden"
@@ -908,6 +1086,187 @@ function todayDate() {
 }
 
 $("document-date").value = todayDate();
+function openSignupWindow() {
+    document
+        .getElementById("signup-window")
+        .classList.remove("hidden");
+
+    document
+        .getElementById("signup-email")
+        .focus();
+}
+
+function closeSignupWindow() {
+    document
+        .getElementById("signup-window")
+        .classList.add("hidden");
+
+    document
+        .getElementById("signup-message")
+        .textContent = "";
+}
+
+function openPasswordRecoveryWindow() {
+    document
+        .getElementById("recovery-window")
+        .classList.remove("hidden");
+
+    document
+        .getElementById("recovery-email")
+        .focus();
+}
+
+function closePasswordRecoveryWindow() {
+    document
+        .getElementById("recovery-window")
+        .classList.add("hidden");
+
+    document
+        .getElementById("recovery-message")
+        .textContent = "";
+}
+
+async function signUpUser() {
+    const email =
+        document
+            .getElementById("signup-email")
+            .value
+            .trim();
+
+    const password =
+        document
+            .getElementById("signup-password")
+            .value;
+
+    const confirmation =
+        document
+            .getElementById("signup-password-confirm")
+            .value;
+
+    const message =
+        document.getElementById(
+            "signup-message"
+        );
+
+    if (!email || !password || !confirmation) {
+        message.style.color = "#b42318";
+        message.textContent =
+            "اكتب البريد وكلمة المرور وتأكيدها";
+        return;
+    }
+
+    if (password.length < 6) {
+        message.style.color = "#b42318";
+        message.textContent =
+            "كلمة المرور يجب أن تكون 6 أحرف أو أكثر";
+        return;
+    }
+
+    if (password !== confirmation) {
+        message.style.color = "#b42318";
+        message.textContent =
+            "كلمتا المرور غير متطابقتين";
+        return;
+    }
+
+    message.style.color = "#a76500";
+    message.textContent =
+        "جاري إنشاء الحساب...";
+
+    const result =
+        await db.auth.signUp({
+            email: email,
+            password: password
+        });
+
+    if (result.error) {
+        console.error(result.error);
+
+        message.style.color = "#b42318";
+        message.textContent =
+            "فشل إنشاء الحساب: " +
+            result.error.message;
+
+        return;
+    }
+
+    message.style.color = "#16845b";
+    message.textContent =
+        "تم إنشاء الحساب. تحقق من بريدك الإلكتروني إذا طلب النظام ذلك.";
+
+    document
+        .getElementById("signup-password")
+        .value = "";
+
+    document
+        .getElementById("signup-password-confirm")
+        .value = "";
+}
+
+async function sendPasswordRecovery() {
+    const email =
+        document
+            .getElementById("recovery-email")
+            .value
+            .trim();
+
+    const message =
+        document.getElementById(
+            "recovery-message"
+        );
+
+    if (!email) {
+        message.style.color = "#b42318";
+        message.textContent =
+            "اكتب بريدك الإلكتروني أولًا";
+        return;
+    }
+
+    message.style.color = "#a76500";
+    message.textContent =
+        "جاري إرسال رابط الاستعادة...";
+
+    const redirectUrl =
+    "https://abdoelsoltan506-jpg.github.io/business-documents/";
+
+
+    const result =
+        await db.auth.resetPasswordForEmail(
+            email,
+            {
+                redirectTo: redirectUrl
+            }
+        );
+
+    if (result.error) {
+        console.error(result.error);
+
+        message.style.color = "#b42318";
+        if (
+    result.error.message &&
+    result.error.message
+        .toLowerCase()
+        .includes("rate limit")
+) {
+    message.style.color = "#b42318";
+    message.textContent =
+        "تم تجاوز حد إرسال الرسائل مؤقتًا. " +
+        "انتظر قليلًا ثم حاول مرة واحدة فقط.";
+} else {
+    message.style.color = "#b42318";
+    message.textContent =
+        "فشل إرسال الرابط: " +
+        result.error.message;
+}
+
+
+        return;
+    }
+
+    message.style.color = "#16845b";
+    message.textContent =
+        "تم إرسال رابط استعادة كلمة المرور إلى بريدك.";
+}
 
 async function loginUser() {
     const emailInput =
