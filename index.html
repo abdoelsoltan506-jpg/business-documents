@@ -383,6 +383,125 @@ dialog::backdrop {
         grid-template-columns: 1fr;
     }
 }
+.item-editor-row input { min-width:0; }
+@media (max-width:600px) { .item-editor-row { grid-template-columns:1fr 1fr !important; } .item-editor-row > div:first-child { grid-column:1 / -1; } .item-editor-row .remove-item-button { grid-column:1 / -1; width:100%; } }
+
+.item-name-input {
+    width:100%;
+    min-height:74px;
+    resize:vertical;
+    line-height:1.7;
+    white-space:pre-wrap;
+    overflow-wrap:anywhere;
+}
+
+#notes {
+    min-height:130px;
+    resize:vertical;
+    line-height:1.8;
+    white-space:pre-wrap;
+    overflow-wrap:anywhere;
+}
+
+
+.details-items-wrap {
+    margin-top:16px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    overflow-x:auto;
+    background:#fff;
+}
+
+.details-items-table {
+    width:100%;
+    min-width:560px;
+    border-collapse:collapse;
+    font-size:.84rem;
+    direction:rtl;
+}
+
+.details-items-table th {
+    padding:11px 10px;
+    background:#f1f5f9;
+    color:var(--navy);
+    font-size:.76rem;
+    font-weight:800;
+    text-align:right;
+    white-space:nowrap;
+    border-bottom:2px solid #dbe4ee;
+}
+
+.details-items-table td {
+    padding:12px 10px;
+    color:var(--text);
+    vertical-align:top;
+    border-bottom:1px solid #e5eaf0;
+    white-space:pre-line;
+    overflow-wrap:anywhere;
+}
+
+.details-items-table tbody tr:last-child td {
+    border-bottom:0;
+}
+
+.details-items-table .item-index {
+    width:42px;
+    color:var(--muted);
+    text-align:center;
+}
+
+.details-items-table .item-number,
+.details-items-table .item-quantity,
+.details-items-table .item-price,
+.details-items-table .item-total {
+    text-align:right;
+    white-space:nowrap;
+    direction:ltr;
+}
+
+.details-items-table .item-quantity,
+.details-items-table .item-price,
+.details-items-table .item-total {
+    font-variant-numeric:tabular-nums;
+}
+
+.details-items-table .item-total {
+    color:var(--blue);
+    font-weight:800;
+}
+
+.details-total-box {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    margin-top:12px;
+    padding:13px 15px;
+    background:#eef6ff;
+    border:1px solid #cfe1f5;
+    border-radius:10px;
+}
+
+.details-total-box strong {
+    color:var(--blue);
+    font-size:1.15rem;
+    direction:ltr;
+}
+
+@media (max-width:600px) {
+    .details-items-table {
+        min-width:520px;
+    }
+}
+
+
+#header-text, #conclusion-text, #footer-text { min-height:78px; resize:vertical; line-height:1.8; white-space:pre-line; }
+.print-header, .print-footer, .print-conclusion { white-space:pre-line; line-height:1.9; overflow-wrap:anywhere; }
+.print-header { margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid var(--navy); text-align:center; font-weight:bold; }
+.print-footer { margin-top:18px; padding-top:12px; border-top:2px solid var(--navy); text-align:center; color:var(--muted); font-size:.8rem; }
+.print-conclusion { margin-top:18px; padding:12px 0; text-align:right; font-weight:bold; }
+.amount-words-box { margin-top:12px; padding:12px 15px; background:#f8fafc; border:1px dashed #b9c9d9; border-radius:9px; line-height:1.9; }
+@media print { body { background:#fff !important; } header, .panel, .pagination, #cards, .modal-header, .print-button { display:none !important; } dialog#details-dialog { display:block !important; position:static; width:100%; max-width:none; border:0; padding:0; } dialog#details-dialog::backdrop { display:none; } dialog#details-dialog .modal { padding:0; box-shadow:none; } .print-header, .print-footer, .print-conclusion { display:block !important; } }
 </style>
 </head>
 
@@ -945,19 +1064,16 @@ dialog::backdrop {
         </div>
 
         <div class="full-width">
-            <label>البيان أو الصنف</label>
-            <input id="item-name">
-        </div>
-
-        <div>
-            <label>الكمية</label>
-            <input id="item-quantity" type="number" value="1">
-        </div>
-
-        <div>
-            <label>سعر الوحدة</label>
-            <input id="item-price" type="number" step="0.01" value="0">
-        </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;">
+        <label style="margin:0;">بنود المستند</label>
+        <button type="button" class="secondary-button" onclick="addItemRow()" style="padding:7px 10px;font-size:.78rem;">+ إضافة بند</button>
+    </div>
+    <div id="items-editor" style="display:flex;flex-direction:column;gap:10px;"></div>
+    <div style="margin-top:12px;padding:12px;background:#eef6ff;border:1px solid #cfe1f5;border-radius:9px;text-align:right;">
+        <span style="color:#64748b;font-size:.75rem;">الإجمالي النهائي المحسوب</span>
+        <strong id="items-total-preview" style="display:block;color:var(--blue);font-size:1.15rem;margin-top:4px;">0.00</strong>
+    </div>
+</div>
 
         <div class="full-width">
             <label>رابط المصدر أو المرفق</label>
@@ -965,10 +1081,25 @@ dialog::backdrop {
         </div>
 
         <div class="full-width">
-            <label>ملاحظات</label>
-            <textarea id="notes"></textarea>
+            <label>ملاحظات وشروط</label>
+            <textarea id="notes" placeholder="اكتب كل ملاحظة أو شرط في سطر مستقل...
+مثال:
+1. التوريد خلال 7 أيام
+2. السعر شامل الضريبة"></textarea>
         </div>
 
+        <div class="full-width">
+            <label>هيدر المستند للطباعة</label>
+            <textarea id="header-text" placeholder="اسم الشركة أو العنوان أو بيانات أعلى المستند"></textarea>
+        </div>
+        <div class="full-width">
+            <label>الخاتمة</label>
+            <textarea id="conclusion-text" placeholder="وتقبلوا فائق الاحترام والتقدير"></textarea>
+        </div>
+        <div class="full-width">
+            <label>فوتر المستند للطباعة</label>
+            <textarea id="footer-text" placeholder="العنوان أو الهاتف أو البريد الإلكتروني أو بيانات أسفل المستند"></textarea>
+        </div>
     </div>
 
     <div class="actions">
@@ -1090,11 +1221,10 @@ dialog::backdrop {
         <div class="modal-header">
             <h2 id="modal-title"></h2>
 
-            <button
-                class="close-button"
-                onclick="closeDetails()">
-                إغلاق
-            </button>
+            <div style="display:flex;gap:8px;align-items:center;">
+                <button class="secondary-button print-button" type="button" onclick="printDetails()">طباعة</button>
+                <button class="close-button" onclick="closeDetails()">إغلاق</button>
+            </div>
         </div>
 
         <div id="modal-body"></div>
@@ -1597,6 +1727,140 @@ async function updateUserPassword() {
     document
         .getElementById("new-password-confirm")
         .value = "";
+}
+
+function calculateItemsTotal() {
+    let total = 0;
+    document.querySelectorAll(".item-editor-row").forEach(row => {
+        const quantity = Number(row.querySelector(".item-quantity-input").value || 0);
+        const price = Number(row.querySelector(".item-price-input").value || 0);
+        const lineTotal = quantity * price;
+        row.querySelector(".item-line-total").textContent = lineTotal.toLocaleString("ar-EG", {minimumFractionDigits: 2});
+        total += lineTotal;
+    });
+    const amount = $("amount");
+    if (amount) amount.value = total.toFixed(2);
+    const preview = $("items-total-preview");
+    if (preview) preview.textContent = total.toLocaleString("ar-EG", {minimumFractionDigits: 2});
+    return total;
+}
+function createItemRow(item = {}) {
+    const row = document.createElement("div");
+    row.className = "item-editor-row";
+    row.style.cssText = "display:grid;grid-template-columns:minmax(190px,2fr) minmax(80px,.8fr) minmax(100px,1fr) minmax(110px,1fr) auto;gap:8px;align-items:end;padding:12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;";
+
+    row.innerHTML = `
+        <div>
+            <label>البيان أو الصنف</label>
+            <textarea
+                class="item-name-input"
+                rows="3"
+                placeholder="اكتب البيان كاملًا هنا..."
+            ></textarea>
+        </div>
+
+        <div>
+            <label>الكمية</label>
+            <input
+                type="number"
+                min="0"
+                step="any"
+                class="item-quantity-input"
+                value="${item.quantity ?? 1}"
+            >
+        </div>
+
+        <div>
+            <label>سعر الوحدة</label>
+            <input
+                type="number"
+                min="0"
+                step="0.01"
+                class="item-price-input"
+                value="${item.price ?? 0}"
+            >
+        </div>
+
+        <div>
+            <label>إجمالي البند</label>
+            <strong
+                class="item-line-total"
+                style="display:block;padding:10px;color:var(--blue);background:#eef6ff;border-radius:8px;min-height:20px;"
+            >
+                0.00
+            </strong>
+        </div>
+
+        <button
+            type="button"
+            class="secondary-button remove-item-button"
+            style="padding:10px;color:#b42318;background:#fbe9e7;"
+        >
+            حذف
+        </button>
+    `;
+
+    row.querySelector(".item-name-input").value =
+        item.name || "";
+
+    row.querySelector(
+        ".item-quantity-input"
+    ).addEventListener(
+        "input",
+        calculateItemsTotal
+    );
+
+    row.querySelector(
+        ".item-price-input"
+    ).addEventListener(
+        "input",
+        calculateItemsTotal
+    );
+
+    row.querySelector(
+        ".remove-item-button"
+    ).addEventListener(
+        "click",
+        () => {
+            const rows = document.querySelectorAll(
+                ".item-editor-row"
+            );
+
+            if (rows.length === 1) {
+                row.querySelector(
+                    ".item-name-input"
+                ).value = "";
+
+                row.querySelector(
+                    ".item-quantity-input"
+                ).value = 1;
+
+                row.querySelector(
+                    ".item-price-input"
+                ).value = 0;
+            } else {
+                row.remove();
+            }
+
+            calculateItemsTotal();
+        }
+    );
+
+    return row;
+}
+function addItemRow(item = {}) { const editor = $("items-editor"); if (!editor) return; editor.appendChild(createItemRow(item)); calculateItemsTotal(); }
+function setItemsEditor(items) { const editor = $("items-editor"); if (!editor) return; editor.innerHTML = ""; if (!Array.isArray(items) || items.length === 0) addItemRow(); else items.forEach(item => editor.appendChild(createItemRow(item))); calculateItemsTotal(); }
+function getItemsFromEditor() {
+    const items = [];
+    document.querySelectorAll(".item-editor-row").forEach(row => {
+        const name = row.querySelector(".item-name-input").value.trim();
+        const quantity = Number(row.querySelector(".item-quantity-input").value || 0);
+        const price = Number(row.querySelector(".item-price-input").value || 0);
+        if (!name && quantity === 0 && price === 0) return;
+        if (!name) throw new Error("اكتب بيان كل بند أو احذف السطر الفارغ");
+        items.push({name, quantity, price, total: quantity * price});
+    });
+    return items;
 }
 
 async function loginUser() {
@@ -2303,19 +2567,10 @@ function startEditDocument(documentId) {
     $("notes").value =
         record.notes || "";
 
-    const firstItem =
-        Array.isArray(record.items)
-            ? record.items[0]
-            : null;
-
-    $("item-name").value =
-        firstItem?.name || "";
-
-    $("item-quantity").value =
-        firstItem?.quantity ?? 1;
-
-    $("item-price").value =
-        firstItem?.price ?? 0;
+        $("header-text").value = record.header_text || "";
+    $("conclusion-text").value = record.conclusion_text || "";
+    $("footer-text").value = record.footer_text || "";
+    setItemsEditor(Array.isArray(record.items) ? record.items : []);
 
     $("form-message").style.color =
         "var(--orange)";
@@ -2360,20 +2615,20 @@ if (!currentOrganizationId) {
         return;
     }
 
-    const quantity =
-        Number($("item-quantity").value || 0);
-
-    const price =
-        Number($("item-price").value || 0);
-
-    const itemName =
-        $("item-name").value.trim();
-
-    const amount =
-        $("amount").value === ""
-            ? quantity * price
-            : Number($("amount").value);
-
+    let items;
+    try {
+        items = getItemsFromEditor();
+    } catch (error) {
+        message.style.color = "var(--red)";
+        message.textContent = error.message;
+        return;
+    }
+    if (items.length === 0) {
+        message.style.color = "var(--red)";
+        message.textContent = "أضف بندًا واحدًا على الأقل";
+        return;
+    }
+    const amount = items.reduce((sum, item) => sum + item.total, 0);
     const data = {
         organization_id:
     currentOrganizationId,
@@ -2403,16 +2658,10 @@ if (!currentOrganizationId) {
         notes:
             $("notes").value.trim() || null,
 
-        items: itemName
-            ? [
-                {
-                    name: itemName,
-                    quantity,
-                    price,
-                    total: quantity * price
-                }
-            ]
-            : []
+                header_text: $("header-text").value.trim() || null,
+        conclusion_text: $("conclusion-text").value.trim() || null,
+        footer_text: $("footer-text").value.trim() || null,
+        items
 
         /*
           لا نرسل document_date هنا.
@@ -2470,148 +2719,223 @@ if (editingDocumentId) {
 
 /* مسح النموذج */
 function clearForm() {
-    [
-        "document-number",
-        "entity-name",
-        "period-from",
-        "period-to",
-        "item-name",
-        "source-url",
-        "notes"
-    ].forEach(id => {
-        $(id).value = "";
-    });
-
+    ["document-number", "entity-name", "period-from", "period-to", "source-url", "notes", "header-text", "conclusion-text", "footer-text"].forEach(id => { const field = $(id); if (field) field.value = ""; });
     $("amount").value = "";
-    $("item-quantity").value = 1;
-    $("item-price").value = 0;
     $("document-date").value = todayDate();
+    setItemsEditor();
 }
-
 /* فتح التفاصيل */
-function openDetails(id) {
-    const document =
-        currentDocuments.find(
-            row => String(row.id) === String(id)
-        );
+function arabicAmountWords(value) {
+    const number = Number(value || 0);
+    if (!Number.isFinite(number)) return "";
+    const integer = Math.floor(Math.abs(number));
+    const piastres = Math.round((Math.abs(number) - integer) * 100);
+    const ones = ["", "واحد", "اثنان", "ثلاثة", "أربعة", "خمسة", "ستة", "سبعة", "ثمانية", "تسعة"];
+    const teens = ["عشرة", "أحد عشر", "اثنا عشر", "ثلاثة عشر", "أربعة عشر", "خمسة عشر", "ستة عشر", "سبعة عشر", "ثمانية عشر", "تسعة عشر"];
+    const tens = ["", "", "عشرون", "ثلاثون", "أربعون", "خمسون", "ستون", "سبعون", "ثمانون", "تسعون"];
+    const hundreds = ["", "مائة", "مائتان", "ثلاثمائة", "أربعمائة", "خمسمائة", "ستمائة", "سبعمائة", "ثمانمائة", "تسعمائة"];
+    function under100(n) { if (n < 10) return ones[n]; if (n < 20) return teens[n-10]; const t=Math.floor(n/10), o=n%10; return o ? `${ones[o]} و${tens[t]}` : tens[t]; }
+    function under1000(n) { if (n < 100) return under100(n); const h=Math.floor(n/100), r=n%100; return r ? `${hundreds[h]} و${under100(r)}` : hundreds[h]; }
+    function group(n) { if (n < 1000) return under1000(n); const out=[]; const m=Math.floor(n/1000000), k=Math.floor((n%1000000)/1000), r=n%1000; if(m) out.push(m===1?"مليون":m===2?"مليونان":`${under1000(m)} مليون`); if(k) out.push(k===1?"ألف":k===2?"ألفان":k>=3 && k<=10?`${under1000(k)} آلاف`:`${under1000(k)} ألفًا`); if(r) out.push(under1000(r)); return out.join(" و"); }
+    let result = integer === 0 ? "صفر" : group(integer);
+    result += " جنيه";
+    if (piastres) result += ` و${group(piastres)} قرشًا`;
+    return `${result} فقط لا غير`;
+}
+function printDetails() { window.print(); }
 
-    if (!document) {
+function openDetails(id) {
+    const record = currentDocuments.find(
+        row => String(row.id) === String(id)
+    );
+
+    if (!record) {
         return;
     }
 
+    const items = Array.isArray(record.items)
+        ? record.items
+        : [];
+
+    const formatNumber = value => {
+        const number = Number(value || 0);
+        return Number.isFinite(number)
+            ? number.toLocaleString("ar-EG", {
+                minimumFractionDigits: 2
+            })
+            : "0.00";
+    };
+
+    const finalTotal = items.length
+        ? items.reduce(
+            (sum, item) => {
+                const lineTotal = Number(
+                    item.total ??
+                    Number(item.quantity || 0) *
+                    Number(item.price || 0)
+                );
+                return sum + (Number.isFinite(lineTotal) ? lineTotal : 0);
+            },
+            0
+        )
+        : Number(record.amount || 0);
+
+    const amountWords = arabicAmountWords(finalTotal);
+
     $("modal-title").textContent =
-        `${document.document_type} — ${
-            document.document_number || "بدون رقم"
+        `${record.document_type || "مستند"} — ${
+            record.document_number || "بدون رقم"
         }`;
 
-    const items =
-        Array.isArray(document.items)
-            ? document.items
-            : [];
-
     $("modal-body").innerHTML = `
-        <div class="details">
+        ${record.header_text ? `<div class="print-header">${escapeHtml(record.header_text)}</div>` : ""}
+        <section
+            style="
+                padding:14px;
+                background:#f8fafc;
+                border:1px solid var(--line);
+                border-radius:10px;
+            "
+        >
+            <h3 style="margin:0 0 12px;color:var(--navy);">
+                البيانات الأساسية
+            </h3>
 
-            <div>
-                <span>الجهة</span>
-                ${escapeHtml(document.entity_name)}
+            <div class="details">
+                <div>
+                    <span>نوع المستند</span>
+                    ${escapeHtml(record.document_type || "—")}
+                </div>
+                <div>
+                    <span>الحالة</span>
+                    ${escapeHtml(record.status || "—")}
+                </div>
+                <div>
+                    <span>رقم المستند</span>
+                    ${escapeHtml(record.document_number || "—")}
+                </div>
+                <div>
+                    <span>الجهة</span>
+                    ${escapeHtml(record.entity_name || "—")}
+                </div>
+                <div>
+                    <span>تاريخ المستند</span>
+                    ${escapeHtml(record.document_date || "—")}
+                </div>
+                <div>
+                    <span>تاريخ التسجيل</span>
+                    ${record.created_at
+                        ? escapeHtml(new Date(record.created_at).toLocaleString("ar-EG"))
+                        : "—"}
+                </div>
             </div>
+        </section>
 
-            <div>
-                <span>تاريخ المستند</span>
-                ${escapeHtml(document.document_date)}
-            </div>
+        <section style="margin-top:16px;">
+            <h3 style="margin:0 0 10px;color:var(--navy);">
+                البنود
+            </h3>
 
-            <div>
-                <span>وقت التسجيل</span>
-                ${
-                    document.created_at
-                        ? new Date(
-                            document.created_at
-                          ).toLocaleString("ar-EG")
-                        : "—"
-                }
-            </div>
+            ${items.length
+                ? `
+                    <div class="details-items-wrap">
+                        <table class="details-items-table">
+                            <thead>
+                                <tr>
+                                    <th class="item-index">م</th>
+                                    <th>البيان أو الصنف</th>
+                                    <th>الكمية</th>
+                                    <th>سعر الوحدة</th>
+                                    <th>إجمالي البند</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${items.map((item, index) => {
+                                    const lineTotal = Number(
+                                        item.total ??
+                                        Number(item.quantity || 0) *
+                                        Number(item.price || 0)
+                                    );
 
-            <div>
-                <span>الحالة</span>
-                ${escapeHtml(document.status)}
-            </div>
+                                    return `
+                                        <tr>
+                                            <td class="item-index">
+                                                ${index + 1}
+                                            </td>
+                                            <td>
+                                                ${escapeHtml(item.name || "—")}
+                                            </td>
+                                            <td class="item-quantity">
+                                                ${escapeHtml(item.quantity ?? 0)}
+                                            </td>
+                                            <td class="item-price">
+                                                ${formatNumber(item.price)}
+                                            </td>
+                                            <td class="item-total">
+                                                ${formatNumber(lineTotal)}
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join("")}
+                            </tbody>
+                        </table>
+                    </div>
 
-            <div>
-                <span>القيمة</span>
-                ${
-                    document.amount == null
-                        ? "—"
-                        : Number(
-                            document.amount
-                          ).toLocaleString(
-                            "ar-EG",
-                            {
-                                minimumFractionDigits: 2
-                            }
-                          )
-                }
-            </div>
-
-            <div>
-                <span>الفترة</span>
-                ${escapeHtml(
-                    [
-                        document.period_from,
-                        document.period_to
-                    ]
-                    .filter(Boolean)
-                    .join(" — ") || "—"
-                )}
-            </div>
-
-            <div>
-                <span>المصدر</span>
-                ${
-                    document.source_url
-                        ? `
-                            <a
-                                href="${escapeHtml(
-                                    document.source_url
-                                )}"
-                                target="_blank">
-                                فتح الرابط
-                            </a>
-                          `
-                        : "—"
-                }
-            </div>
-
-        </div>
-
-        <div class="items">
-            <b>الأصناف</b>
-
-            ${
-                items.length
-                    ? items.map(item => `
-                        <div class="item">
-                            <span>
-                                ${escapeHtml(item.name)}
-                                ×
-                                ${escapeHtml(item.quantity)}
-                            </span>
-
-                            <b>
-                                ${escapeHtml(item.total)}
-                            </b>
-                        </div>
-                    `).join("")
-                    : "<p>لا توجد أصناف مسجلة.</p>"
+                    <div class="details-total-box">
+                        <span>الإجمالي النهائي</span>
+                        <strong>${formatNumber(finalTotal)}</strong>
+                    </div>
+                    <div class="amount-words-box">
+                        <span>المبلغ بالحروف</span>
+                        <strong>${escapeHtml(amountWords)}</strong>
+                    </div>
+                `
+                : `
+                    <div class="empty" style="padding:20px;">
+                        لا توجد بنود مسجلة.
+                    </div>
+                `
             }
-        </div>
+        </section>
 
-        <p style="color:var(--muted);">
-            ${escapeHtml(
-                document.notes || "لا توجد ملاحظات"
-            )}
-        </p>
+        <section
+            style="
+                margin-top:16px;
+                padding:15px;
+                background:#fff;
+                border:1px solid var(--line);
+                border-radius:10px;
+            "
+        >
+            <h3 style="margin:0 0 12px;color:var(--navy);">
+                بيانات إضافية
+            </h3>
+
+            <div class="details">
+                <div>
+                    <span>الفترة</span>
+                    ${escapeHtml([
+                        record.period_from,
+                        record.period_to
+                    ].filter(Boolean).join(" — ") || "—")}
+                </div>
+                <div>
+                    <span>المصدر</span>
+                    ${record.source_url
+                        ? `<a href="${escapeHtml(record.source_url)}" target="_blank" rel="noopener noreferrer">فتح الرابط</a>`
+                        : "—"}
+                </div>
+            </div>
+
+            <div style="margin-top:14px;padding:12px;background:#f8fafc;border-radius:8px;">
+                <span>ملاحظات وشروط</span>
+                <p style="margin:8px 0 0;white-space:pre-line;line-height:1.8;">
+                    ${escapeHtml(record.notes || "لا توجد ملاحظات أو شروط")}
+                </p>
+            </div>
+        </section>
+        ${record.conclusion_text ? `<div class="print-conclusion">${escapeHtml(record.conclusion_text)}</div>` : ""}
+        ${record.footer_text ? `<div class="print-footer">${escapeHtml(record.footer_text)}</div>` : ""}
     `;
 
     $("details-dialog").showModal();
@@ -3215,6 +3539,7 @@ await loadOrganizationMembers();
     );
 }
 
+setItemsEditor();
 startApplication();
 
 </script>
