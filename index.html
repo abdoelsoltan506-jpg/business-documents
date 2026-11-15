@@ -331,6 +331,197 @@ dialog::backdrop {
     padding-bottom: 12px;
 }
 
+/* تنسيق مهني موحّد لنافذة التفاصيل */
+.details-document {
+    color:var(--text);
+}
+
+.details-document-header {
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:18px;
+    padding:16px 18px;
+    margin-bottom:16px;
+    background:linear-gradient(135deg,#f8fbff,#eef5fc);
+    border:1px solid #d5e2ef;
+    border-radius:12px;
+}
+
+.details-document-kicker {
+    color:var(--muted);
+    font-size:.76rem;
+    margin-bottom:5px;
+}
+
+.details-document-name {
+    color:var(--navy);
+    font-size:1.12rem;
+    font-weight:800;
+}
+
+.details-document-number {
+    color:var(--muted);
+    font-size:.78rem;
+    margin-top:5px;
+}
+
+.details-status-badge {
+    background:#e8f5ef;
+    color:var(--green);
+    border-radius:20px;
+    padding:7px 12px;
+    font-size:.75rem;
+    font-weight:700;
+    white-space:nowrap;
+}
+
+.details-section {
+    margin-top:16px;
+    padding:16px;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:12px;
+}
+
+.details-section-title {
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin:0 0 13px;
+    color:var(--navy);
+    font-size:.95rem;
+    font-weight:800;
+}
+
+.details-section-title::before {
+    content:"";
+    display:block;
+    width:4px;
+    height:18px;
+    background:var(--blue);
+    border-radius:4px;
+}
+
+.details-info-grid {
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:0;
+    border:1px solid #e5eaf0;
+    border-radius:9px;
+    overflow:hidden;
+}
+
+.details-info-cell {
+    min-height:62px;
+    padding:10px 12px;
+    background:#fff;
+    border-left:1px solid #e5eaf0;
+    border-bottom:1px solid #e5eaf0;
+    font-size:.82rem;
+}
+
+.details-info-cell:nth-child(3n) { border-left:0; }
+.details-info-cell:nth-last-child(-n+3) { border-bottom:0; }
+.details-info-cell span,
+.details-notes-label {
+    display:block;
+    color:var(--muted);
+    font-size:.7rem;
+    margin-bottom:5px;
+}
+
+.details-items-table {
+    min-width:600px;
+}
+
+.details-items-table th {
+    background:var(--navy);
+    color:#fff;
+    border-bottom:0;
+    padding:11px 10px;
+}
+
+.details-items-table td {
+    padding:11px 10px;
+}
+
+.details-items-table tbody tr:nth-child(even) td {
+    background:#f8fafc;
+}
+
+.details-total-box {
+    margin-top:12px;
+    padding:13px 15px;
+    background:#eef6ff;
+    border:1px solid #cfe1f5;
+}
+
+.details-total-box span,
+.amount-words-box span {
+    color:var(--muted);
+    font-size:.76rem;
+}
+
+.amount-words-box {
+    display:flex;
+    align-items:baseline;
+    gap:8px;
+    margin-top:8px;
+    padding:11px 15px;
+    background:#fffdf5;
+    border:1px solid #eadfb9;
+    border-radius:9px;
+    line-height:1.8;
+}
+
+.amount-words-box strong {
+    color:#765b00;
+    font-size:.82rem;
+}
+
+.details-additional-grid {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+}
+
+.details-additional-cell {
+    padding:11px 12px;
+    background:#f8fafc;
+    border:1px solid #e5eaf0;
+    border-radius:9px;
+    font-size:.82rem;
+}
+
+.details-source-link {
+    color:var(--blue);
+    text-decoration:none;
+    font-weight:700;
+}
+
+.details-notes-box {
+    margin-top:12px;
+    padding:12px;
+    background:#fbfcfe;
+    border:1px dashed #cbd5e1;
+    border-radius:9px;
+    line-height:1.9;
+    white-space:pre-line;
+    font-size:.82rem;
+}
+
+@media (max-width:600px) {
+    .details-document-header { display:block; }
+    .details-status-badge { display:inline-block; margin-top:12px; }
+    .details-info-grid { grid-template-columns:1fr 1fr; }
+    .details-info-cell:nth-child(3n) { border-left:1px solid #e5eaf0; }
+    .details-info-cell:nth-child(2n) { border-left:0; }
+    .details-info-cell:nth-last-child(-n+3) { border-bottom:1px solid #e5eaf0; }
+    .details-info-cell:nth-last-child(-n+2) { border-bottom:0; }
+    .details-additional-grid { grid-template-columns:1fr; }
+}
+
 .close-button {
     border: 0;
     border-radius: 7px;
@@ -485,6 +676,92 @@ dialog::backdrop {
 .details-total-box strong {
     color:var(--blue);
     font-size:1.15rem;
+    direction:ltr;
+}
+
+/* جدول البنود داخل البطاقة الرئيسية */
+.card-items-wrap {
+    margin-top:14px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    overflow-x:auto;
+    background:#fff;
+}
+
+.card-items-table {
+    width:100%;
+    min-width:500px;
+    border-collapse:collapse;
+    font-size:.78rem;
+    direction:rtl;
+}
+
+.card-items-table th {
+    padding:9px 8px;
+    background:#f1f5f9;
+    color:var(--navy);
+    font-size:.7rem;
+    font-weight:800;
+    text-align:right;
+    white-space:nowrap;
+    border-bottom:2px solid #dbe4ee;
+}
+
+.card-items-table td {
+    padding:9px 8px;
+    color:var(--text);
+    vertical-align:top;
+    border-bottom:1px solid #e5eaf0;
+    white-space:pre-line;
+    overflow-wrap:anywhere;
+}
+
+.card-items-table tbody tr:last-child td {
+    border-bottom:0;
+}
+
+.card-items-table .card-item-index {
+    width:32px;
+    color:var(--muted);
+    text-align:center;
+}
+
+.card-items-table .card-item-number,
+.card-items-table .card-item-quantity,
+.card-items-table .card-item-price,
+.card-items-table .card-item-total {
+    text-align:right;
+    white-space:nowrap;
+    direction:ltr;
+    font-variant-numeric:tabular-nums;
+}
+
+.card-items-table .card-item-total {
+    color:var(--blue);
+    font-weight:800;
+}
+
+.card-total-box {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    margin-top:10px;
+    padding:10px 12px;
+    background:#eef6ff;
+    border:1px solid #cfe1f5;
+    border-radius:9px;
+}
+
+.card-total-box span {
+    color:var(--navy);
+    font-size:.78rem;
+    font-weight:700;
+}
+
+.card-total-box strong {
+    color:var(--blue);
+    font-size:1rem;
     direction:ltr;
 }
 
@@ -2373,22 +2650,34 @@ function renderCards() {
 
             const createdTime =
                 document.created_at
-                    ? new Date(
-                        document.created_at
-                      ).toLocaleString("ar-EG")
+                    ? new Date(document.created_at).toLocaleString("ar-EG")
                     : "—";
-const updatedTime =
-    document.updated_at
-        ? new Date(
-            document.updated_at
-          ).toLocaleString("ar-EG")
-        : createdTime;
 
+            const updatedTime =
+                document.updated_at
+                    ? new Date(document.updated_at).toLocaleString("ar-EG")
+                    : createdTime;
 
-            const itemsCount =
-                Array.isArray(document.items)
-                    ? document.items.length
-                    : 0;
+            const items = Array.isArray(document.items)
+                ? document.items
+                : [];
+
+            const formatNumber = value => {
+                const number = Number(value || 0);
+                return Number.isFinite(number)
+                    ? number.toLocaleString("ar-EG", { minimumFractionDigits: 2 })
+                    : "0.00";
+            };
+
+            const finalTotal = items.length
+                ? items.reduce((sum, item) => {
+                    const lineTotal = Number(
+                        item.total ??
+                        Number(item.quantity || 0) * Number(item.price || 0)
+                    );
+                    return sum + (Number.isFinite(lineTotal) ? lineTotal : 0);
+                }, 0)
+                : Number(document.amount || 0);
 
             return `
                 <article class="card">
@@ -2396,16 +2685,12 @@ const updatedTime =
                     <div class="card-header">
                         <div>
                             <div class="document-type">
-                                ${escapeHtml(
-                                    document.document_type
-                                )}
+                                ${escapeHtml(document.document_type)}
                             </div>
 
                             <div class="document-number">
                                 الرقم:
-                                ${escapeHtml(
-                                    document.document_number || "—"
-                                )}
+                                ${escapeHtml(document.document_number || "—")}
                             </div>
                         </div>
 
@@ -2415,7 +2700,6 @@ const updatedTime =
                     </div>
 
                     <div class="card-data">
-
                         <div>
                             <span>الجهة</span>
                             ${escapeHtml(document.entity_name)}
@@ -2427,101 +2711,108 @@ const updatedTime =
                         </div>
 
                         <div>
-                            <span>وقت التسجيل من Supabase</span>
+                            <span>وقت التسجيل</span>
                             ${escapeHtml(createdTime)}
                         </div>
-<div
-    style="
-        grid-column:1 / -1;
-        color:#6b7280;
-        font-size:.68rem;
-        text-align:right;
-    "
->
-    آخر تعديل:
-    ${escapeHtml(updatedTime)}
-</div>
-
 
                         <div>
-                            <span>القيمة</span>
-                            <b class="amount">
-                                ${
-                                    document.amount == null
-                                        ? "—"
-                                        : Number(
-                                            document.amount
-                                          ).toLocaleString(
-                                            "ar-EG",
-                                            {
-                                                minimumFractionDigits: 2
-                                            }
-                                          )
-                                }
-                            </b>
+                            <span>آخر تعديل</span>
+                            ${escapeHtml(updatedTime)}
                         </div>
-
-                        <div>
-                            <span>عدد البنود</span>
-                            ${itemsCount}
-                        </div>
-
                     </div>
 
+                    ${items.length ? `
+                        <div class="card-items-wrap">
+                            <table class="card-items-table">
+                                <thead>
+                                    <tr>
+                                        <th class="card-item-index">م</th>
+                                        <th>البيان أو الصنف</th>
+                                        <th>الكمية</th>
+                                        <th>سعر الوحدة</th>
+                                        <th>إجمالي البند</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${items.map((item, index) => {
+                                        const lineTotal = Number(
+                                            item.total ??
+                                            Number(item.quantity || 0) * Number(item.price || 0)
+                                        );
+
+                                        return `
+                                            <tr>
+                                                <td class="card-item-index">${index + 1}</td>
+                                                <td>${escapeHtml(item.name || "—")}</td>
+                                                <td class="card-item-quantity">${escapeHtml(item.quantity ?? 0)}</td>
+                                                <td class="card-item-price">${formatNumber(item.price)}</td>
+                                                <td class="card-item-total">${formatNumber(lineTotal)}</td>
+                                            </tr>
+                                        `;
+                                    }).join("")}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="card-total-box">
+                            <span>الإجمالي النهائي</span>
+                            <strong>${formatNumber(finalTotal)}</strong>
+                        </div>
+                    ` : `
+                        <div class="empty" style="padding:15px;margin-top:14px;">
+                            لا توجد بنود مسجلة.
+                        </div>
+                    `}
+
                     <button
-    class="details-button"
-    onclick="openDetails('${document.id}')">
-    فتح التفاصيل
-</button>
+                        class="details-button"
+                        onclick="openDetails('${document.id}')">
+                        فتح التفاصيل
+                    </button>
 
-<button
-    type="button"
-    class="edit-document-button"
-    onclick="startEditDocument('${document.id}')"
-    style="
-        width:100%;
-        margin-top:8px;
-        padding:10px;
-        border:0;
-        border-radius:8px;
-        background:#e8f5ef;
-        color:#16845b;
-        cursor:pointer;
-    "
->
-    تعديل المستند
-</button>
+                    <button
+                        type="button"
+                        class="edit-document-button"
+                        onclick="startEditDocument('${document.id}')"
+                        style="
+                            width:100%;
+                            margin-top:8px;
+                            padding:10px;
+                            border:0;
+                            border-radius:8px;
+                            background:#e8f5ef;
+                            color:#16845b;
+                            cursor:pointer;
+                        "
+                    >
+                        تعديل المستند
+                    </button>
 
-
-
-${
-    currentOrganizationRole === "owner" ||
-currentOrganizationRole === "admin" ||
-currentCanDelete === true
-
-        ? `
-            <button
-                type="button"
-                class="delete-document-button"
-                onclick="deleteDocument('${document.id}')"
-                style="
-                    width:100%;
-                    margin-top:8px;
-                    padding:10px;
-                    border:0;
-                    border-radius:8px;
-                    background:#fbe9e7;
-                    color:#b42318;
-                    cursor:pointer;
-                "
-            >
-                حذف المستند
-            </button>
-          `
-        : ""
-}
-
-
+                    ${
+                        currentOrganizationRole === "owner" ||
+                        currentOrganizationRole === "admin" ||
+                        currentCanDelete === true
+                            ? `
+                                <button
+                                    type="button"
+                                    class="delete-document-button"
+                                    onclick="deleteDocument('${document.id}')"
+                                    style="
+                                        width:100%;
+                                        margin-top:8px;
+                                        padding:10px;
+                                        border:0;
+                                        border-radius:8px;
+                                        background:#fbe9e7;
+                                        color:#b42318;
+                                        cursor:pointer;
+                                    "
+                                >
+                                    حذف المستند
+                                </button>
+                              `
+                            : ""
+                    }
 
                 </article>
             `;
@@ -2788,154 +3079,134 @@ function openDetails(id) {
         }`;
 
     $("modal-body").innerHTML = `
-        ${record.header_text ? `<div class="print-header">${escapeHtml(record.header_text)}</div>` : ""}
-        <section
-            style="
-                padding:14px;
-                background:#f8fafc;
-                border:1px solid var(--line);
-                border-radius:10px;
-            "
-        >
-            <h3 style="margin:0 0 12px;color:var(--navy);">
-                البيانات الأساسية
-            </h3>
+        <div class="details-document">
+            ${record.header_text ? `<div class="print-header">${escapeHtml(record.header_text)}</div>` : ""}
 
-            <div class="details">
+            <div class="details-document-header">
                 <div>
-                    <span>نوع المستند</span>
-                    ${escapeHtml(record.document_type || "—")}
+                    <div class="details-document-kicker">تفاصيل المستند</div>
+                    <div class="details-document-name">
+                        ${escapeHtml(record.document_type || "مستند")}
+                    </div>
+                    <div class="details-document-number">
+                        رقم المستند: ${escapeHtml(record.document_number || "بدون رقم")}
+                    </div>
                 </div>
-                <div>
-                    <span>الحالة</span>
+                <div class="details-status-badge">
                     ${escapeHtml(record.status || "—")}
                 </div>
-                <div>
-                    <span>رقم المستند</span>
-                    ${escapeHtml(record.document_number || "—")}
-                </div>
-                <div>
-                    <span>الجهة</span>
-                    ${escapeHtml(record.entity_name || "—")}
-                </div>
-                <div>
-                    <span>تاريخ المستند</span>
-                    ${escapeHtml(record.document_date || "—")}
-                </div>
-                <div>
-                    <span>تاريخ التسجيل</span>
-                    ${record.created_at
-                        ? escapeHtml(new Date(record.created_at).toLocaleString("ar-EG"))
-                        : "—"}
-                </div>
-            </div>
-        </section>
-
-        <section style="margin-top:16px;">
-            <h3 style="margin:0 0 10px;color:var(--navy);">
-                البنود
-            </h3>
-
-            ${items.length
-                ? `
-                    <div class="details-items-wrap">
-                        <table class="details-items-table">
-                            <thead>
-                                <tr>
-                                    <th class="item-index">م</th>
-                                    <th>البيان أو الصنف</th>
-                                    <th>الكمية</th>
-                                    <th>سعر الوحدة</th>
-                                    <th>إجمالي البند</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${items.map((item, index) => {
-                                    const lineTotal = Number(
-                                        item.total ??
-                                        Number(item.quantity || 0) *
-                                        Number(item.price || 0)
-                                    );
-
-                                    return `
-                                        <tr>
-                                            <td class="item-index">
-                                                ${index + 1}
-                                            </td>
-                                            <td>
-                                                ${escapeHtml(item.name || "—")}
-                                            </td>
-                                            <td class="item-quantity">
-                                                ${escapeHtml(item.quantity ?? 0)}
-                                            </td>
-                                            <td class="item-price">
-                                                ${formatNumber(item.price)}
-                                            </td>
-                                            <td class="item-total">
-                                                ${formatNumber(lineTotal)}
-                                            </td>
-                                        </tr>
-                                    `;
-                                }).join("")}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="details-total-box">
-                        <span>الإجمالي النهائي</span>
-                        <strong>${formatNumber(finalTotal)}</strong>
-                    </div>
-                    <div class="amount-words-box">
-                        <span>المبلغ بالحروف</span>
-                        <strong>${escapeHtml(amountWords)}</strong>
-                    </div>
-                `
-                : `
-                    <div class="empty" style="padding:20px;">
-                        لا توجد بنود مسجلة.
-                    </div>
-                `
-            }
-        </section>
-
-        <section
-            style="
-                margin-top:16px;
-                padding:15px;
-                background:#fff;
-                border:1px solid var(--line);
-                border-radius:10px;
-            "
-        >
-            <h3 style="margin:0 0 12px;color:var(--navy);">
-                بيانات إضافية
-            </h3>
-
-            <div class="details">
-                <div>
-                    <span>الفترة</span>
-                    ${escapeHtml([
-                        record.period_from,
-                        record.period_to
-                    ].filter(Boolean).join(" — ") || "—")}
-                </div>
-                <div>
-                    <span>المصدر</span>
-                    ${record.source_url
-                        ? `<a href="${escapeHtml(record.source_url)}" target="_blank" rel="noopener noreferrer">فتح الرابط</a>`
-                        : "—"}
-                </div>
             </div>
 
-            <div style="margin-top:14px;padding:12px;background:#f8fafc;border-radius:8px;">
-                <span>ملاحظات وشروط</span>
-                <p style="margin:8px 0 0;white-space:pre-line;line-height:1.8;">
+            <section class="details-section">
+                <h3 class="details-section-title">البيانات الأساسية</h3>
+                <div class="details-info-grid">
+                    <div class="details-info-cell">
+                        <span>الجهة أو العميل</span>
+                        ${escapeHtml(record.entity_name || "—")}
+                    </div>
+                    <div class="details-info-cell">
+                        <span>نوع المستند</span>
+                        ${escapeHtml(record.document_type || "—")}
+                    </div>
+                    <div class="details-info-cell">
+                        <span>رقم المستند</span>
+                        ${escapeHtml(record.document_number || "—")}
+                    </div>
+                    <div class="details-info-cell">
+                        <span>تاريخ المستند</span>
+                        ${escapeHtml(record.document_date || "—")}
+                    </div>
+                    <div class="details-info-cell">
+                        <span>تاريخ التسجيل</span>
+                        ${record.created_at
+                            ? escapeHtml(new Date(record.created_at).toLocaleString("ar-EG"))
+                            : "—"}
+                    </div>
+                    <div class="details-info-cell">
+                        <span>الفترة</span>
+                        ${escapeHtml([
+                            record.period_from,
+                            record.period_to
+                        ].filter(Boolean).join(" — ") || "—")}
+                    </div>
+                </div>
+            </section>
+
+            <section class="details-section">
+                <h3 class="details-section-title">تفاصيل البنود المالية</h3>
+                ${items.length
+                    ? `
+                        <div class="details-items-wrap">
+                            <table class="details-items-table">
+                                <thead>
+                                    <tr>
+                                        <th class="item-index">م</th>
+                                        <th>البيان أو الصنف</th>
+                                        <th>الكمية</th>
+                                        <th>سعر الوحدة</th>
+                                        <th>إجمالي البند</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${items.map((item, index) => {
+                                        const lineTotal = Number(
+                                            item.total ??
+                                            Number(item.quantity || 0) * Number(item.price || 0)
+                                        );
+                                        return `
+                                            <tr>
+                                                <td class="item-index">${index + 1}</td>
+                                                <td>${escapeHtml(item.name || "—")}</td>
+                                                <td class="item-quantity">${escapeHtml(item.quantity ?? 0)}</td>
+                                                <td class="item-price">${formatNumber(item.price)}</td>
+                                                <td class="item-total">${formatNumber(lineTotal)}</td>
+                                            </tr>
+                                        `;
+                                    }).join("")}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="details-total-box">
+                            <span>الإجمالي النهائي</span>
+                            <strong>${formatNumber(finalTotal)}</strong>
+                        </div>
+                        <div class="amount-words-box">
+                            <span>المبلغ بالحروف:</span>
+                            <strong>${escapeHtml(amountWords)}</strong>
+                        </div>
+                    `
+                    : `
+                        <div class="empty" style="padding:20px;">
+                            لا توجد بنود مسجلة.
+                        </div>
+                    `}
+            </section>
+
+            <section class="details-section">
+                <h3 class="details-section-title">البيانات الإضافية والملاحظات</h3>
+                <div class="details-additional-grid">
+                    <div class="details-additional-cell">
+                        <span>رابط المصدر أو المرفق</span>
+                        ${record.source_url
+                            ? `<a class="details-source-link" href="${escapeHtml(record.source_url)}" target="_blank" rel="noopener noreferrer">فتح الرابط</a>`
+                            : "—"}
+                    </div>
+                    <div class="details-additional-cell">
+                        <span>آخر تعديل</span>
+                        ${record.updated_at
+                            ? escapeHtml(new Date(record.updated_at).toLocaleString("ar-EG"))
+                            : "—"}
+                    </div>
+                </div>
+                <div class="details-notes-box">
+                    <span class="details-notes-label">ملاحظات وشروط</span>
                     ${escapeHtml(record.notes || "لا توجد ملاحظات أو شروط")}
-                </p>
-            </div>
-        </section>
-        ${record.conclusion_text ? `<div class="print-conclusion">${escapeHtml(record.conclusion_text)}</div>` : ""}
-        ${record.footer_text ? `<div class="print-footer">${escapeHtml(record.footer_text)}</div>` : ""}
+                </div>
+            </section>
+
+            ${record.conclusion_text ? `<div class="print-conclusion">${escapeHtml(record.conclusion_text)}</div>` : ""}
+            ${record.footer_text ? `<div class="print-footer">${escapeHtml(record.footer_text)}</div>` : ""}
+        </div>
     `;
 
     $("details-dialog").showModal();
