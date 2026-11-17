@@ -1467,6 +1467,51 @@ dialog#details-dialog[open] #modal-body {
     }
 }
 
+
+/* الهاتف فقط: تغطية كاملة من الحافة إلى الحافة */
+@media (max-width:600px) {
+    html:has(dialog#details-dialog[open]),
+    body:has(dialog#details-dialog[open]) {
+        overflow:hidden;
+    }
+
+    dialog#details-dialog[open] {
+        position:fixed !important;
+        inset:0 !important;
+        top:0 !important;
+        right:0 !important;
+        bottom:0 !important;
+        left:0 !important;
+        width:100vw !important;
+        min-width:100vw !important;
+        max-width:none !important;
+        height:100dvh !important;
+        min-height:100dvh !important;
+        max-height:none !important;
+        margin:0 !important;
+        padding:0 !important;
+        border:0 !important;
+        border-radius:0 !important;
+        background:#fff !important;
+        box-shadow:none !important;
+        transform:none !important;
+    }
+
+    dialog#details-dialog[open] .modal {
+        width:100vw !important;
+        min-width:0 !important;
+        max-width:none !important;
+        height:100dvh !important;
+        min-height:100dvh !important;
+        max-height:none !important;
+        margin:0 !important;
+        padding:10px !important;
+        border-radius:0 !important;
+        overflow-x:hidden !important;
+        overflow-y:auto !important;
+    }
+}
+
 </style>
 </head>
 
