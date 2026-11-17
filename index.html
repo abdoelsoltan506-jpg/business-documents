@@ -450,11 +450,22 @@ dialog::backdrop {
     background:#f8fafc;
 }
 
-.details-total-box {
+.details-totals-box {
+    display:grid;
+    gap:8px;
     margin-top:12px;
+}
+
+.details-total-box {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    margin-top:0;
     padding:13px 15px;
     background:#eef6ff;
     border:1px solid #cfe1f5;
+    border-radius:9px;
 }
 
 .details-total-box span,
@@ -467,7 +478,7 @@ dialog::backdrop {
     display:flex;
     align-items:baseline;
     gap:8px;
-    margin-top:8px;
+    margin-top:0;
     padding:11px 15px;
     background:#fffdf5;
     border:1px solid #eadfb9;
@@ -779,6 +790,398 @@ dialog::backdrop {
 .print-conclusion { margin-top:18px; padding:12px 0; text-align:right; font-weight:bold; }
 .amount-words-box { margin-top:12px; padding:12px 15px; background:#f8fafc; border:1px dashed #b9c9d9; border-radius:9px; line-height:1.9; }
 @media print { body { background:#fff !important; } header, .panel, .pagination, #cards, .modal-header, .print-button { display:none !important; } dialog#details-dialog { display:block !important; position:static; width:100%; max-width:none; border:0; padding:0; } dialog#details-dialog::backdrop { display:none; } dialog#details-dialog .modal { padding:0; box-shadow:none; } .print-header, .print-footer, .print-conclusion { display:block !important; } }
+
+/* صندوق موحّد متصل للإجمالي والمبلغ بالحروف */
+.details-totals-box {
+    display:block;
+    margin-top:12px;
+    padding:0;
+    background:#eef6ff;
+    border:1px solid #cfe1f5;
+    border-radius:10px;
+    overflow:hidden;
+}
+
+.details-totals-box .details-total-box,
+.details-totals-box .amount-words-box {
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin:0;
+    padding:12px 15px;
+    background:transparent;
+    border:0;
+    border-radius:0;
+    line-height:1.8;
+}
+
+.details-totals-box .details-total-box {
+    justify-content:space-between;
+}
+
+.details-totals-box .amount-words-box {
+    justify-content:flex-start;
+}
+
+.details-totals-box .amount-words-box strong {
+    color:#765b00;
+    font-size:.82rem;
+}
+
+
+/* ربط جدول البنود بالإجماليات في بطاقة واحدة متصلة */
+.details-items-bundle {
+    margin-top:0;
+    border:1px solid var(--line);
+    border-radius:10px;
+    overflow:hidden;
+    background:#fff;
+}
+
+.details-items-bundle .details-items-wrap {
+    margin-top:0;
+    border:0;
+    border-radius:0;
+}
+
+.details-items-bundle .details-totals-box {
+    margin-top:0;
+    border:0;
+    border-radius:0;
+}
+
+
+/* شكل خلايا احترافي مثل Excel وWord */
+.details-items-table th,
+.details-items-table td {
+    border:1px solid #cbd5e1;
+}
+
+.details-items-table thead th {
+    border-color:#17324d;
+}
+
+.details-items-table tbody tr:nth-child(even) td {
+    background:#f8fafc;
+}
+
+/* صف واحد للإجمالي والحروف والرقم */
+.details-totals-box {
+    display:block;
+    margin:0;
+    padding:0;
+    background:#eef6ff;
+    border:0;
+    border-radius:0;
+}
+
+.details-total-row {
+    display:grid;
+    grid-template-columns:minmax(110px,.8fr) minmax(260px,3fr) minmax(110px,1fr);
+    align-items:center;
+    min-height:52px;
+}
+
+.details-total-row > * {
+    min-height:52px;
+    display:flex;
+    align-items:center;
+    padding:10px 12px;
+    border-left:1px solid #cbd5e1;
+}
+
+.details-total-row > *:last-child {
+    border-left:0;
+}
+
+.details-total-label {
+    color:var(--navy);
+    font-weight:800;
+}
+
+.details-words-inline {
+    gap:8px;
+    flex-wrap:wrap;
+    color:var(--muted);
+    font-size:.78rem;
+}
+
+.details-words-inline strong {
+    color:#765b00;
+    font-size:.82rem;
+}
+
+.details-total-value {
+    justify-content:flex-end;
+    color:var(--blue);
+    font-size:1.15rem;
+    direction:ltr;
+    white-space:nowrap;
+}
+
+@media (max-width:600px) {
+    .details-total-row {
+        grid-template-columns:1fr;
+    }
+
+    .details-total-row > * {
+        min-height:auto;
+        border-left:0;
+        border-bottom:1px solid #cbd5e1;
+    }
+
+    .details-total-row > *:last-child {
+        border-bottom:0;
+    }
+}
+
+
+/* جدول حقيقي مثل Excel وWord: عرض كامل وتمرير أسفل الجدول */
+.details-items-wrap {
+    overflow-x:auto;
+    overflow-y:hidden;
+    -webkit-overflow-scrolling:touch;
+}
+
+.details-items-table {
+    width:100%;
+    min-width:820px;
+    table-layout:auto;
+    border-collapse:collapse;
+}
+
+.details-items-table th,
+.details-items-table td {
+    border:1px solid #b8c4d1;
+}
+
+.details-items-table thead th {
+    border-color:#17324d;
+}
+
+.details-items-table tbody td {
+    white-space:pre-line;
+}
+
+.details-items-table tfoot td {
+    background:#eef6ff;
+    border:1px solid #b8c4d1;
+    padding:12px 10px;
+    vertical-align:middle;
+}
+
+.details-items-table tfoot .details-total-label {
+    color:var(--navy);
+    font-weight:800;
+    white-space:nowrap;
+}
+
+.details-items-table tfoot .details-words-cell {
+    min-width:390px;
+    color:var(--muted);
+    line-height:1.8;
+    white-space:normal;
+}
+
+.details-items-table tfoot .details-words-cell span {
+    display:inline;
+    color:var(--muted);
+    font-size:.76rem;
+    margin:0 0 0 6px;
+}
+
+.details-items-table tfoot .details-words-cell strong {
+    color:#765b00;
+    font-size:.82rem;
+    font-weight:700;
+}
+
+.details-items-table tfoot .details-total-value {
+    min-width:125px;
+    color:var(--blue);
+    font-size:1.15rem;
+    font-weight:800;
+    direction:ltr;
+    text-align:right;
+    white-space:nowrap;
+}
+
+
+/* ورقة كاملة بلا تمرير أفقي، مناسبة للعرض والطباعة */
+dialog#details-dialog {
+    width:min(1000px,95vw);
+    max-width:1000px;
+    max-height:92vh;
+}
+
+.details-items-wrap {
+    overflow-x:visible;
+    overflow-y:visible;
+}
+
+.details-items-table {
+    width:100%;
+    min-width:0;
+    table-layout:fixed;
+    font-size:.78rem;
+}
+
+.details-items-table th,
+.details-items-table td {
+    overflow-wrap:anywhere;
+    word-break:normal;
+}
+
+.details-items-table th:nth-child(1),
+.details-items-table td:nth-child(1) {
+    width:7%;
+}
+
+.details-items-table th:nth-child(2),
+.details-items-table td:nth-child(2) {
+    width:39%;
+}
+
+.details-items-table th:nth-child(3),
+.details-items-table td:nth-child(3) {
+    width:12%;
+}
+
+.details-items-table th:nth-child(4),
+.details-items-table td:nth-child(4) {
+    width:19%;
+}
+
+.details-items-table th:nth-child(5),
+.details-items-table td:nth-child(5) {
+    width:23%;
+}
+
+.details-items-table tfoot .details-words-cell {
+    min-width:0;
+    white-space:normal;
+    overflow-wrap:anywhere;
+}
+
+.details-items-table tfoot .details-words-cell strong {
+    color:#765b00;
+    font-size:.8rem;
+    font-weight:700;
+}
+
+@media print {
+    @page {
+        size:A4 portrait;
+        margin:12mm;
+    }
+
+    body {
+        background:#fff !important;
+    }
+
+    dialog#details-dialog {
+        width:100% !important;
+        max-width:none !important;
+        max-height:none !important;
+        margin:0 !important;
+    }
+
+    dialog#details-dialog .modal {
+        padding:0 !important;
+    }
+
+    .details-items-wrap {
+        overflow:visible !important;
+    }
+
+    .details-items-table {
+        width:100% !important;
+        min-width:0 !important;
+        table-layout:fixed !important;
+        font-size:10px !important;
+    }
+
+    .details-items-table th,
+    .details-items-table td {
+        padding:6px 5px !important;
+    }
+}
+
+
+/* مساحة مريحة لإدخال البيان أو الصنف */
+.items-section {
+    grid-column:1 / -1;
+}
+
+.items-section .item-editor-row {
+    width:100%;
+}
+
+.item-name-input {
+    min-height:112px;
+    padding:12px;
+    line-height:1.8;
+    font-size:.9rem;
+}
+
+.item-editor-row label {
+    font-size:.78rem;
+    font-weight:700;
+}
+
+.item-editor-row input {
+    min-height:46px;
+}
+
+.item-editor-row .item-line-total {
+    min-height:46px !important;
+    display:flex !important;
+    align-items:center;
+}
+
+@media (max-width:900px) {
+    .item-editor-row {
+        grid-template-columns:minmax(260px,2fr) minmax(90px,1fr) minmax(120px,1fr) !important;
+    }
+
+    .item-editor-row > div:first-child {
+        grid-column:1 / -1;
+    }
+
+    .item-editor-row > div:nth-child(4) {
+        grid-column:span 1;
+    }
+}
+
+
+/* حقول الطباعة الإضافية بشكل بسيط وآمن */
+.print-settings-section select {
+    margin-bottom:10px;
+}
+
+#print-intro {
+    min-height:90px;
+}
+
+.print-intro {
+    margin:0 0 16px;
+    padding:12px 0;
+    color:var(--text);
+    line-height:1.9;
+    white-space:pre-line;
+    overflow-wrap:anywhere;
+}
+
+
+.print-fields-title { margin:4px 0 10px; color:var(--navy); font-size:1rem; }
+.print-parts-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.print-parts-grid textarea { min-height:82px; resize:vertical; }
+.print-parts-grid select { margin-top:6px; }
+.compatibility-note { display:block; margin-top:8px; color:var(--muted); }
+.print-three-parts { display:grid !important; grid-template-columns:repeat(3,1fr); gap:14px; text-align:initial !important; }
+.print-three-parts > div { min-width:0; white-space:pre-line; overflow-wrap:anywhere; }
+@media (max-width:700px) { .print-parts-grid, .print-three-parts { grid-template-columns:1fr; } }
+
 </style>
 </head>
 
@@ -1340,7 +1743,7 @@ dialog::backdrop {
             <input id="period-to">
         </div>
 
-        <div class="full-width">
+        <div class="full-width items-section">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;">
         <label style="margin:0;">بنود المستند</label>
         <button type="button" class="secondary-button" onclick="addItemRow()" style="padding:7px 10px;font-size:.78rem;">+ إضافة بند</button>
@@ -1365,17 +1768,31 @@ dialog::backdrop {
 2. السعر شامل الضريبة"></textarea>
         </div>
 
+        <div class="full-width print-settings-section">
+            <h3 class="print-fields-title">الهيدر — ثلاثة أجزاء مستقلة</h3>
+            <div class="print-parts-grid">
+                <div><label for="header-right">الهيدر الأيمن</label><textarea id="header-right" placeholder="اسم الشركة أو الشعار أو العنوان"></textarea><select id="header-right-style"><option value="normal">عادي</option><option value="bold">عريض</option><option value="underline">تحته خط</option><option value="bold-underline">عريض وتحته خط</option></select></div>
+                <div><label for="header-center">الهيدر الأوسط</label><textarea id="header-center" placeholder="عنوان المستند أو بيانات وسط الصفحة"></textarea><select id="header-center-style"><option value="normal">عادي</option><option value="bold" selected>عريض</option><option value="underline">تحته خط</option><option value="bold-underline">عريض وتحته خط</option></select></div>
+                <div><label for="header-left">الهيدر الأيسر</label><textarea id="header-left" placeholder="الهاتف أو البريد أو الفرع"></textarea><select id="header-left-style"><option value="normal">عادي</option><option value="bold">عريض</option><option value="underline">تحته خط</option><option value="bold-underline">عريض وتحته خط</option></select></div>
+            </div>
+            <small class="compatibility-note">المستندات القديمة التي تحتوي على الهيدر السابق ستظهر تلقائيًا في الجزء الأوسط.</small>
+        </div>
         <div class="full-width">
-            <label>هيدر المستند للطباعة</label>
-            <textarea id="header-text" placeholder="اسم الشركة أو العنوان أو بيانات أعلى المستند"></textarea>
+            <label>مقدمة أو شرح المستند (اختياري)</label>
+            <textarea id="intro-text" placeholder="مثال: يسعدنا أن نقدم لكم عرض السعر التالي..."></textarea>
         </div>
         <div class="full-width">
             <label>الخاتمة</label>
             <textarea id="conclusion-text" placeholder="وتقبلوا فائق الاحترام والتقدير"></textarea>
         </div>
-        <div class="full-width">
-            <label>فوتر المستند للطباعة</label>
-            <textarea id="footer-text" placeholder="العنوان أو الهاتف أو البريد الإلكتروني أو بيانات أسفل المستند"></textarea>
+        <div class="full-width print-settings-section">
+            <h3 class="print-fields-title">الفوتر — ثلاثة أجزاء مستقلة</h3>
+            <div class="print-parts-grid">
+                <div><label for="footer-right">الفوتر الأيمن</label><textarea id="footer-right" placeholder="العنوان أو الهاتف"></textarea><select id="footer-right-style"><option value="normal">عادي</option><option value="bold">عريض</option><option value="underline">تحته خط</option><option value="bold-underline">عريض وتحته خط</option></select></div>
+                <div><label for="footer-center">الفوتر الأوسط</label><textarea id="footer-center" placeholder="عبارة ختامية أو بيانات الشركة"></textarea><select id="footer-center-style"><option value="normal">عادي</option><option value="bold">عريض</option><option value="underline">تحته خط</option><option value="bold-underline">عريض وتحته خط</option></select></div>
+                <div><label for="footer-left">الفوتر الأيسر</label><textarea id="footer-left" placeholder="الرقم الضريبي أو البريد"></textarea><select id="footer-left-style"><option value="normal">عادي</option><option value="bold">عريض</option><option value="underline">تحته خط</option><option value="bold-underline">عريض وتحته خط</option></select></div>
+            </div>
+            <small class="compatibility-note">الفوتر القديم سيظهر تلقائيًا في الجزء الأوسط.</small>
         </div>
     </div>
 
@@ -1500,6 +1917,7 @@ dialog::backdrop {
 
             <div style="display:flex;gap:8px;align-items:center;">
                 <button class="secondary-button print-button" type="button" onclick="printDetails()">طباعة</button>
+                <button class="secondary-button print-button" type="button" onclick="exportPdf()">تصدير PDF</button>
                 <button class="close-button" onclick="closeDetails()">إغلاق</button>
             </div>
         </div>
@@ -2024,7 +2442,7 @@ function calculateItemsTotal() {
 function createItemRow(item = {}) {
     const row = document.createElement("div");
     row.className = "item-editor-row";
-    row.style.cssText = "display:grid;grid-template-columns:minmax(190px,2fr) minmax(80px,.8fr) minmax(100px,1fr) minmax(110px,1fr) auto;gap:8px;align-items:end;padding:12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;";
+    row.style.cssText = "display:grid;grid-template-columns:minmax(340px,3fr) minmax(95px,.75fr) minmax(130px,1fr) minmax(145px,1.1fr) auto;gap:10px;align-items:end;padding:14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;";
 
     row.innerHTML = `
         <div>
@@ -2858,9 +3276,20 @@ function startEditDocument(documentId) {
     $("notes").value =
         record.notes || "";
 
-        $("header-text").value = record.header_text || "";
+        $("header-right").value = record.header_right || "";
+    $("header-center").value = record.header_center || record.header_text || "";
+    $("header-left").value = record.header_left || "";
+    $("header-right-style").value = record.header_right_style || "normal";
+    $("header-center-style").value = record.header_center_style || "bold";
+    $("header-left-style").value = record.header_left_style || "normal";
+    $("intro-text").value = record.intro_text || "";
     $("conclusion-text").value = record.conclusion_text || "";
-    $("footer-text").value = record.footer_text || "";
+    $("footer-right").value = record.footer_right || "";
+    $("footer-center").value = record.footer_center || record.footer_text || "";
+    $("footer-left").value = record.footer_left || "";
+    $("footer-right-style").value = record.footer_right_style || "normal";
+    $("footer-center-style").value = record.footer_center_style || "normal";
+    $("footer-left-style").value = record.footer_left_style || "normal";
     setItemsEditor(Array.isArray(record.items) ? record.items : []);
 
     $("form-message").style.color =
@@ -2949,9 +3378,24 @@ if (!currentOrganizationId) {
         notes:
             $("notes").value.trim() || null,
 
-                header_text: $("header-text").value.trim() || null,
+                header_text: null,
+        header_align: "center",
+        header_right: $("header-right").value.trim() || null,
+        header_center: $("header-center").value.trim() || null,
+        header_left: $("header-left").value.trim() || null,
+        header_right_style: $("header-right-style").value || "normal",
+        header_center_style: $("header-center-style").value || "bold",
+        header_left_style: $("header-left-style").value || "normal",
+        intro_text: $("intro-text").value.trim() || null,
         conclusion_text: $("conclusion-text").value.trim() || null,
-        footer_text: $("footer-text").value.trim() || null,
+        footer_text: null,
+        footer_align: "center",
+        footer_right: $("footer-right").value.trim() || null,
+        footer_center: $("footer-center").value.trim() || null,
+        footer_left: $("footer-left").value.trim() || null,
+        footer_right_style: $("footer-right-style").value || "normal",
+        footer_center_style: $("footer-center-style").value || "normal",
+        footer_left_style: $("footer-left-style").value || "normal",
         items
 
         /*
@@ -3010,7 +3454,9 @@ if (editingDocumentId) {
 
 /* مسح النموذج */
 function clearForm() {
-    ["document-number", "entity-name", "period-from", "period-to", "source-url", "notes", "header-text", "conclusion-text", "footer-text"].forEach(id => { const field = $(id); if (field) field.value = ""; });
+    ["document-number", "entity-name", "period-from", "period-to", "source-url", "notes", "header-right", "header-center", "header-left", "intro-text", "conclusion-text", "footer-right", "footer-center", "footer-left"].forEach(id => { const field = $(id); if (field) field.value = ""; });
+    ["header-right-style", "header-left-style", "footer-right-style", "footer-center-style", "footer-left-style"].forEach(id => { const field = $(id); if (field) field.value = "normal"; });
+    if ($("header-center-style")) $("header-center-style").value = "bold";
     $("amount").value = "";
     $("document-date").value = todayDate();
     setItemsEditor();
@@ -3033,7 +3479,27 @@ function arabicAmountWords(value) {
     if (piastres) result += ` و${group(piastres)} قرشًا`;
     return `${result} فقط لا غير`;
 }
-function printDetails() { window.print(); }
+function normalizeTextAlign(value) {
+    return ["right", "center", "left"].includes(value)
+        ? value
+        : "center";
+}
+
+function normalizeTextStyle(value) {
+    if (value === "bold") return "font-weight:700;";
+    if (value === "underline") return "text-decoration:underline;";
+    if (value === "bold-underline") return "font-weight:700;text-decoration:underline;";
+    return "";
+}
+
+function printDetails() {
+    window.print();
+}
+
+function exportPdf() {
+    // من نافذة الطباعة اختر: Save as PDF / حفظ كملف PDF
+    window.print();
+}
 
 function openDetails(id) {
     const record = currentDocuments.find(
@@ -3072,19 +3538,27 @@ function openDetails(id) {
         : Number(record.amount || 0);
 
     const amountWords = arabicAmountWords(finalTotal);
+    const headerRight = record.header_right || "";
+    const headerCenter = record.header_center || record.header_text || "";
+    const headerLeft = record.header_left || "";
+    const footerRight = record.footer_right || "";
+    const footerCenter = record.footer_center || record.footer_text || "";
+    const footerLeft = record.footer_left || "";
+    const hasHeaderParts = headerRight || headerCenter || headerLeft;
+    const hasFooterParts = footerRight || footerCenter || footerLeft;
 
-    $("modal-title").textContent =
-        `${record.document_type || "مستند"} — ${
-            record.document_number || "بدون رقم"
-        }`;
+    $("modal-title").textContent = "";
 
     $("modal-body").innerHTML = `
         <div class="details-document">
-            ${record.header_text ? `<div class="print-header">${escapeHtml(record.header_text)}</div>` : ""}
-
+            ${hasHeaderParts ? `
+                <div class="print-header print-three-parts">
+                    <div style="${normalizeTextStyle(record.header_right_style)}">${escapeHtml(headerRight)}</div>
+                    <div style="${normalizeTextStyle(record.header_center_style)}">${escapeHtml(headerCenter)}</div>
+                    <div style="${normalizeTextStyle(record.header_left_style)}">${escapeHtml(headerLeft)}</div>
+                </div>` : ""}
             <div class="details-document-header">
                 <div>
-                    <div class="details-document-kicker">تفاصيل المستند</div>
                     <div class="details-document-name">
                         ${escapeHtml(record.document_type || "مستند")}
                     </div>
@@ -3132,12 +3606,15 @@ function openDetails(id) {
                 </div>
             </section>
 
+            ${record.intro_text ? `<div class="print-intro" style="text-align:${normalizeTextAlign(record.header_align)}">${escapeHtml(record.intro_text)}</div>` : ""}
+
             <section class="details-section">
                 <h3 class="details-section-title">تفاصيل البنود المالية</h3>
                 ${items.length
                     ? `
-                        <div class="details-items-wrap">
-                            <table class="details-items-table">
+                        <div class="details-items-bundle">
+                            <div class="details-items-wrap">
+                                <table class="details-items-table">
                                 <thead>
                                     <tr>
                                         <th class="item-index">م</th>
@@ -3164,15 +3641,20 @@ function openDetails(id) {
                                         `;
                                     }).join("")}
                                 </tbody>
-                            </table>
-                        </div>
-                        <div class="details-total-box">
-                            <span>الإجمالي النهائي</span>
-                            <strong>${formatNumber(finalTotal)}</strong>
-                        </div>
-                        <div class="amount-words-box">
-                            <span>المبلغ بالحروف:</span>
-                            <strong>${escapeHtml(amountWords)}</strong>
+                                <tfoot>
+                                    <tr class="details-totals-row">
+                                        <td class="item-index"></td>
+                                        <td class="details-total-label">الإجمالي</td>
+                                        <td class="details-words-cell" colspan="2">
+                                            <strong>${escapeHtml(amountWords)}</strong>
+                                        </td>
+                                        <td class="details-total-value">
+                                            ${formatNumber(finalTotal)}
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                                </table>
+                            </div>
                         </div>
                     `
                     : `
@@ -3205,7 +3687,12 @@ function openDetails(id) {
             </section>
 
             ${record.conclusion_text ? `<div class="print-conclusion">${escapeHtml(record.conclusion_text)}</div>` : ""}
-            ${record.footer_text ? `<div class="print-footer">${escapeHtml(record.footer_text)}</div>` : ""}
+            ${hasFooterParts ? `
+                <div class="print-footer print-three-parts">
+                    <div style="${normalizeTextStyle(record.footer_right_style)}">${escapeHtml(footerRight)}</div>
+                    <div style="${normalizeTextStyle(record.footer_center_style)}">${escapeHtml(footerCenter)}</div>
+                    <div style="${normalizeTextStyle(record.footer_left_style)}">${escapeHtml(footerLeft)}</div>
+                </div>` : ""}
         </div>
     `;
 
