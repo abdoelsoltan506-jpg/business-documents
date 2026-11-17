@@ -1182,6 +1182,168 @@ dialog#details-dialog {
 .print-three-parts > div { min-width:0; white-space:pre-line; overflow-wrap:anywhere; }
 @media (max-width:700px) { .print-parts-grid, .print-three-parts { grid-template-columns:1fr; } }
 
+
+/* بطاقة التفاصيل فقط: عرض كامل مع تمرير داخلي عند طول المحتوى */
+dialog#details-dialog {
+    width:min(1000px,95vw);
+    max-width:1000px;
+    max-height:92vh;
+    padding:0;
+    overflow:hidden;
+}
+
+dialog#details-dialog .modal {
+    max-height:92vh;
+    overflow-y:auto;
+    overflow-x:hidden;
+    padding:22px;
+}
+
+dialog#details-dialog #modal-body {
+    display:block;
+    width:100%;
+}
+
+@media (max-width:600px) {
+    dialog#details-dialog .modal {
+        padding:14px;
+    }
+}
+
+
+/* تحسين بطاقة التفاصيل للهاتف فقط — لا يغيّر البطاقات الرئيسية */
+@media (max-width:600px) {
+    dialog#details-dialog {
+        width:96vw;
+        max-width:96vw;
+        max-height:94vh;
+        margin:auto;
+        border-radius:12px;
+    }
+
+    dialog#details-dialog .modal {
+        width:auto;
+        max-height:94vh;
+        padding:12px;
+        overflow-x:hidden;
+        overflow-y:auto;
+    }
+
+    dialog#details-dialog .modal-header {
+        display:flex;
+        flex-wrap:wrap;
+        gap:8px;
+        align-items:center;
+    }
+
+    dialog#details-dialog .modal-header h2 {
+        flex:1 1 100%;
+        margin:0 0 4px;
+        font-size:1rem;
+    }
+
+    dialog#details-dialog .modal-header > div {
+        width:100%;
+        display:flex;
+        flex-wrap:wrap;
+        gap:6px !important;
+    }
+
+    dialog#details-dialog .modal-header button {
+        flex:1 1 auto;
+        min-height:40px;
+        font-size:.78rem;
+    }
+
+    dialog#details-dialog .details-document-header {
+        display:block;
+        padding:12px;
+        margin-bottom:12px;
+    }
+
+    dialog#details-dialog .details-document-name {
+        font-size:1.05rem;
+        line-height:1.6;
+    }
+
+    dialog#details-dialog .details-document-number {
+        font-size:.78rem;
+        overflow-wrap:anywhere;
+    }
+
+    dialog#details-dialog .details-status-badge {
+        display:inline-block;
+        margin-top:10px;
+    }
+
+    dialog#details-dialog .details-info-grid,
+    dialog#details-dialog .details-additional-grid {
+        grid-template-columns:1fr;
+        gap:8px;
+    }
+
+    dialog#details-dialog .details-section-title {
+        font-size:.95rem;
+        line-height:1.6;
+    }
+
+    dialog#details-dialog .print-three-parts {
+        grid-template-columns:1fr;
+        gap:8px;
+        padding-bottom:10px;
+    }
+
+    dialog#details-dialog .print-three-parts > div {
+        padding:7px 0;
+        border-bottom:1px solid #e5eaf0;
+        text-align:right;
+    }
+
+    dialog#details-dialog .print-three-parts > div:last-child {
+        border-bottom:0;
+    }
+
+    /* التمرير هنا فقط: داخل جدول البنود، وليس في البطاقة كلها */
+    dialog#details-dialog .details-items-wrap {
+        width:100%;
+        max-width:100%;
+        overflow-x:auto;
+        overflow-y:hidden;
+        -webkit-overflow-scrolling:touch;
+    }
+
+    dialog#details-dialog .details-items-table {
+        width:720px;
+        min-width:720px;
+        table-layout:fixed;
+        font-size:.76rem;
+    }
+
+    dialog#details-dialog .details-items-table th,
+    dialog#details-dialog .details-items-table td {
+        padding:8px 6px;
+        line-height:1.7;
+    }
+
+    dialog#details-dialog .details-items-table tfoot .details-words-cell {
+        min-width:320px;
+        white-space:normal;
+        overflow-wrap:anywhere;
+    }
+
+    dialog#details-dialog .details-items-table tfoot .details-total-value {
+        min-width:105px;
+    }
+
+    dialog#details-dialog .print-intro,
+    dialog#details-dialog .details-notes-box,
+    dialog#details-dialog .print-conclusion {
+        font-size:.82rem;
+        line-height:1.9;
+        overflow-wrap:anywhere;
+    }
+}
+
 </style>
 </head>
 
@@ -3547,7 +3709,7 @@ function openDetails(id) {
     const hasHeaderParts = headerRight || headerCenter || headerLeft;
     const hasFooterParts = footerRight || footerCenter || footerLeft;
 
-    $("modal-title").textContent = "";
+    $("modal-title").textContent = "عرض المستند";
 
     $("modal-body").innerHTML = `
         <div class="details-document">
