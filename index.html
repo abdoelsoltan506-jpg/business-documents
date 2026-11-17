@@ -1344,6 +1344,63 @@ dialog#details-dialog #modal-body {
     }
 }
 
+
+/* إصلاح حاوية بطاقة التفاصيل: كاملة ومتمركزة على كل الشاشات */
+dialog#details-dialog[open] {
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    box-sizing:border-box;
+    width:min(1100px,calc(100vw - 24px));
+    max-width:min(1100px,calc(100vw - 24px));
+    height:min(94vh,calc(100vh - 24px));
+    max-height:calc(100vh - 24px);
+    margin:12px auto;
+    padding:0;
+    overflow:hidden;
+}
+
+dialog#details-dialog[open] .modal {
+    box-sizing:border-box;
+    width:100%;
+    min-width:0;
+    max-width:100%;
+    height:100%;
+    max-height:none;
+    overflow-x:hidden;
+    overflow-y:auto;
+}
+
+dialog#details-dialog #modal-body,
+dialog#details-dialog .details-document,
+dialog#details-dialog .details-section,
+dialog#details-dialog .details-document-header,
+dialog#details-dialog .details-items-bundle {
+    box-sizing:border-box;
+    min-width:0;
+    max-width:100%;
+}
+
+dialog#details-dialog .details-items-wrap {
+    box-sizing:border-box;
+    max-width:100%;
+}
+
+@media (max-width:600px) {
+    dialog#details-dialog[open] {
+        width:calc(100vw - 12px);
+        max-width:calc(100vw - 12px);
+        height:calc(100vh - 12px);
+        max-height:calc(100vh - 12px);
+        margin:6px auto;
+        border-radius:10px;
+    }
+
+    dialog#details-dialog[open] .modal {
+        padding:10px;
+    }
+}
+
 </style>
 </head>
 
