@@ -1606,6 +1606,24 @@ dialog#analytics-dialog[open] .analytics-modal {
     dialog#analytics-dialog[open] .modal-header > div { width:100%; justify-content:space-between; }
 }
 
+
+/* إصلاح الهاتف الفعلي: منع تمدد النموذج خارج الشاشة */
+@media (max-width:640px) {
+    html, body { width:100%; max-width:100%; overflow-x:hidden; }
+    .container { width:100%; max-width:100%; padding:14px 10px; }
+    .panel { width:100%; max-width:100%; padding:12px; }
+    .form-grid { width:100%; max-width:100%; grid-template-columns:1fr !important; gap:10px; }
+    .form-grid > div, .form-grid .full-width { width:100%; max-width:100%; min-width:0; grid-column:auto !important; }
+    .form-grid input, .form-grid select, .form-grid textarea { width:100%; max-width:100%; min-width:0; }
+    .items-section, #items-editor { width:100%; max-width:100%; min-width:0; }
+    .item-editor-row { width:100% !important; max-width:100%; min-width:0; grid-template-columns:1fr 1fr !important; }
+    .item-editor-row > div { min-width:0; max-width:100%; }
+    .item-editor-row > div:first-child, .item-editor-row .remove-item-button { grid-column:1 / -1; }
+    .item-editor-row input, .item-editor-row textarea { max-width:100%; min-width:0; }
+    .actions { width:100%; max-width:100%; }
+    .actions button { max-width:100%; }
+}
+
 </style>
 </head>
 
