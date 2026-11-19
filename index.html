@@ -1512,6 +1512,100 @@ dialog#details-dialog[open] #modal-body {
     }
 }
 
+
+.smart-review-modal { width:min(620px,92vw); max-height:88vh; overflow:auto; padding:22px; background:#fff; border-radius:14px; }
+.smart-review-summary { margin:14px 0; color:var(--navy); font-weight:700; }
+.smart-review-list { display:grid; gap:9px; }
+.smart-review-item { padding:11px 13px; border-radius:9px; border:1px solid #dbe3ee; line-height:1.8; }
+.smart-review-item.ok { background:#effaf4; border-color:#b8e2c8; color:#166534; }
+.smart-review-item.warning { background:#fff8e7; border-color:#f1d18a; color:#855b00; }
+.smart-review-item.critical { background:#fff0ef; border-color:#efb4ae; color:#9b1c13; }
+.smart-review-item strong { display:block; margin-bottom:2px; }
+@media (max-width:600px) { .smart-review-modal { width:96vw; max-height:90vh; padding:14px; } }
+
+
+.analytics-modal { width:min(1100px,94vw); max-height:90vh; overflow:auto; padding:22px; background:#fff; border-radius:14px; }
+.analytics-content { margin-top:16px; }
+.analytics-kpis { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:18px; }
+.analytics-kpi { padding:16px; background:#f8fbff; border:1px solid #d5e2ef; border-radius:11px; }
+.analytics-kpi span { display:block; color:var(--muted); font-size:.78rem; margin-bottom:6px; }
+.analytics-kpi strong { display:block; color:var(--navy); font-size:1.35rem; }
+.analytics-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.analytics-panel { border:1px solid var(--line); border-radius:12px; padding:15px; background:#fff; min-width:0; }
+.analytics-panel h3 { margin:0 0 14px; color:var(--navy); font-size:.95rem; }
+.analytics-row { display:grid; grid-template-columns:minmax(100px,1fr) 2fr auto; align-items:center; gap:9px; margin:10px 0; font-size:.8rem; }
+.analytics-row-label { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.analytics-bar { height:12px; background:#edf2f7; border-radius:99px; overflow:hidden; }
+.analytics-bar span { display:block; height:100%; background:linear-gradient(90deg,#2563eb,#58a6ff); border-radius:99px; }
+.analytics-row-value { direction:ltr; white-space:nowrap; color:var(--navy); font-weight:700; }
+.analytics-empty { color:var(--muted); font-size:.85rem; padding:15px 0; }
+@media (max-width:600px) {
+    .analytics-modal { width:96vw; max-height:92vh; padding:14px; }
+    .analytics-kpis, .analytics-grid { grid-template-columns:1fr; }
+    .analytics-row { grid-template-columns:95px 1fr auto; gap:6px; font-size:.74rem; }
+}
+
+
+.analytics-financial-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:14px 0; }
+.analytics-financial-card { padding:12px; border:1px solid #e1e8f0; border-radius:10px; background:#fbfdff; }
+.analytics-financial-card span { display:block; color:var(--muted); font-size:.72rem; margin-bottom:5px; }
+.analytics-financial-card strong { color:var(--navy); font-size:1rem; }
+.analytics-table-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:10px; }
+.analytics-table { width:100%; min-width:620px; border-collapse:collapse; font-size:.78rem; }
+.analytics-table th, .analytics-table td { padding:9px 10px; border-bottom:1px solid #e5eaf0; text-align:right; white-space:nowrap; }
+.analytics-table th { background:#f1f5f9; color:var(--navy); }
+.analytics-table tr:last-child td { border-bottom:0; }
+.analytics-table .number { direction:ltr; text-align:right; font-variant-numeric:tabular-nums; }
+.analytics-share { min-width:120px; }
+.analytics-share-bar { display:inline-block; width:80px; height:8px; margin-left:6px; vertical-align:middle; background:#e8eef5; border-radius:99px; overflow:hidden; }
+.analytics-share-bar span { display:block; height:100%; background:#2563eb; border-radius:99px; }
+@media (max-width:600px) { .analytics-financial-grid { grid-template-columns:1fr 1fr; } }
+
+
+.analytics-filter-bar { display:grid; grid-template-columns:repeat(4,1fr) auto; gap:9px; align-items:end; padding:12px; margin-bottom:10px; background:#f8fbff; border:1px solid #d5e2ef; border-radius:10px; }
+.analytics-filter-bar label { margin-bottom:4px; }
+.analytics-filter-actions { display:flex; gap:6px; }
+.analytics-filter-actions button { padding:9px 12px; white-space:nowrap; }
+.analytics-filter-result { color:var(--muted); font-size:.76rem; margin:8px 0 14px; }
+@media (max-width:800px) { .analytics-filter-bar { grid-template-columns:1fr 1fr; } .analytics-filter-actions { grid-column:1 / -1; } }
+@media (max-width:600px) { .analytics-filter-bar { grid-template-columns:1fr; } .analytics-filter-actions { grid-column:auto; } }
+
+
+/* لوحة التحليلات مستقلة وكاملة الشاشة — الهاتف والكمبيوتر */
+dialog#analytics-dialog[open] {
+    position:fixed !important;
+    inset:0 !important;
+    width:100vw !important;
+    max-width:100vw !important;
+    height:100vh !important;
+    max-height:100vh !important;
+    margin:0 !important;
+    padding:0 !important;
+    border:0 !important;
+    border-radius:0 !important;
+    overflow:hidden !important;
+    background:#fff !important;
+}
+dialog#analytics-dialog[open] .analytics-modal {
+    box-sizing:border-box;
+    width:100%;
+    max-width:1240px;
+    height:100vh;
+    max-height:none;
+    margin:0 auto;
+    padding:clamp(12px,3vw,30px);
+    border-radius:0;
+    overflow-y:auto;
+    overflow-x:hidden;
+}
+@media (max-width:600px) {
+    dialog#analytics-dialog[open] { height:100dvh !important; max-height:100dvh !important; }
+    dialog#analytics-dialog[open] .analytics-modal { height:100dvh; padding:10px; }
+    dialog#analytics-dialog[open] .modal-header { flex-wrap:wrap; gap:8px; }
+    dialog#analytics-dialog[open] .modal-header h2 { flex:1 1 100%; font-size:1rem; }
+    dialog#analytics-dialog[open] .modal-header > div { width:100%; justify-content:space-between; }
+}
+
 </style>
 </head>
 
@@ -2131,6 +2225,10 @@ dialog#details-dialog[open] #modal-body {
             حفظ المستند
         </button>
 
+        <button class="secondary-button" type="button" onclick="runSmartReview()">
+            مراجعة ذكية قبل الحفظ
+        </button>
+
         <button class="secondary-button" onclick="clearForm()">
             مسح الخانات
         </button>
@@ -2208,6 +2306,10 @@ dialog#details-dialog[open] #modal-body {
             عرض الكل
         </button>
 
+        <button class="secondary-button" type="button" onclick="openAnalytics()">
+            التحليلات والرسوم
+        </button>
+
         <span id="filter-message" class="message"></span>
     </div>
 </section>
@@ -2238,6 +2340,37 @@ dialog#details-dialog[open] #modal-body {
 
 </main>
 
+<!-- نافذة التحليلات -->
+<dialog id="analytics-dialog">
+    <div class="analytics-modal">
+        <div class="modal-header">
+            <h2>التحليلات والرسوم البيانية</h2>
+            <div style="display:flex;gap:8px;align-items:center;">
+                <span id="analytics-updated" class="message"></span>
+                <button class="close-button" type="button" onclick="closeAnalytics()">إغلاق</button>
+            </div>
+        </div>
+        <div id="analytics-content" class="analytics-content">
+            <div class="empty">جاري تجهيز التحليلات...</div>
+        </div>
+    </div>
+</dialog>
+
+<!-- نافذة المراجعة الذكية -->
+<dialog id="smart-review-dialog">
+    <div class="smart-review-modal">
+        <div class="modal-header">
+            <h2>مراجعة ذكية قبل الحفظ</h2>
+            <button class="close-button" type="button" onclick="closeSmartReview()">إغلاق</button>
+        </div>
+        <p id="smart-review-summary" class="smart-review-summary"></p>
+        <div id="smart-review-list" class="smart-review-list"></div>
+        <div class="actions">
+            <button class="secondary-button" type="button" onclick="closeSmartReview()">العودة للتعديل</button>
+        </div>
+    </div>
+</dialog>
+
 <!-- نافذة التفاصيل -->
 <dialog id="details-dialog">
     <div class="modal">
@@ -2246,8 +2379,6 @@ dialog#details-dialog[open] #modal-body {
             <h2 id="modal-title"></h2>
 
             <div style="display:flex;gap:8px;align-items:center;">
-                <button class="secondary-button print-button" type="button" onclick="printDetails()">طباعة</button>
-                <button class="secondary-button print-button" type="button" onclick="exportPdf()">تصدير PDF</button>
                 <button class="close-button" onclick="closeDetails()">إغلاق</button>
             </div>
         </div>
@@ -3642,6 +3773,194 @@ function startEditDocument(documentId) {
 }
 
 
+function closeAnalytics() {
+    const dialog = $("analytics-dialog");
+    if (dialog && dialog.open) dialog.close();
+}
+
+async function fetchAllOrganizationDocumentsForAnalytics() {
+    const all = [];
+    const pageSize = 500;
+    let from = 0;
+    const content = $("analytics-content");
+    while (true) {
+        if (content) content.innerHTML = `<div class="empty">جاري تحميل البيانات — تم تحليل ${all.length.toLocaleString("ar-EG")} سجل حتى الآن...</div>`;
+        const result = await db.from("business_documents")
+            .select("id,document_type,document_number,entity_name,status,amount,document_date,created_at")
+            .eq("organization_id", currentOrganizationId)
+            .order("document_date", { ascending: true })
+            .range(from, from + pageSize - 1);
+        if (result.error) throw result.error;
+        const batch = result.data || [];
+        all.push(...batch);
+        if (batch.length < pageSize) break;
+        from += pageSize;
+    }
+    return all;
+}
+
+function formatAnalyticsMoney(value) {
+    return Number(value || 0).toLocaleString("ar-EG", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function analyticsBarRows(entries, formatter) {
+    if (!entries.length) return `<div class="analytics-empty">لا توجد بيانات كافية للعرض.</div>`;
+    const max = Math.max(...entries.map(entry => entry.value), 1);
+    return entries.map(entry => `<div class="analytics-row">
+        <span class="analytics-row-label" title="${escapeHtml(entry.label)}">${escapeHtml(entry.label)}</span>
+        <div class="analytics-bar"><span style="width:${Math.max(3, Math.round(entry.value / max * 100))}%"></span></div>
+        <span class="analytics-row-value">${formatter(entry)}</span>
+    </div>`).join("");
+}
+
+let analyticsDocumentsCache = [];
+
+function analyticsFilterControls(documents) {
+    const types = [...new Set(documents.map(doc => doc.document_type || "غير محدد"))].sort();
+    const statuses = [...new Set(documents.map(doc => doc.status || "غير محدد"))].sort();
+    return `<div class="analytics-filter-bar">
+        <div><label for="analytics-from">من تاريخ</label><input id="analytics-from" type="date"></div>
+        <div><label for="analytics-to">إلى تاريخ</label><input id="analytics-to" type="date"></div>
+        <div><label for="analytics-type">نوع المستند</label><select id="analytics-type"><option value="">كل الأنواع</option>${types.map(type => `<option value="${escapeHtml(type)}">${escapeHtml(type)}</option>`).join("")}</select></div>
+        <div><label for="analytics-status">الحالة</label><select id="analytics-status"><option value="">كل الحالات</option>${statuses.map(status => `<option value="${escapeHtml(status)}">${escapeHtml(status)}</option>`).join("")}</select></div>
+        <div class="analytics-filter-actions"><button class="primary-button" type="button" onclick="applyAnalyticsFilters()">تطبيق</button><button class="secondary-button" type="button" onclick="resetAnalyticsFilters()">مسح</button></div>
+    </div>`;
+}
+
+function renderAnalyticsDashboard() {
+    const content = $("analytics-content");
+    const from = $("analytics-from")?.value || "";
+    const to = $("analytics-to")?.value || "";
+    const type = $("analytics-type")?.value || "";
+    const status = $("analytics-status")?.value || "";
+    const documents = analyticsDocumentsCache.filter(doc => {
+        const date = String(doc.document_date || doc.created_at || "").slice(0, 10);
+        return (!from || date >= from) && (!to || date <= to) && (!type || (doc.document_type || "غير محدد") === type) && (!status || (doc.status || "غير محدد") === status);
+    });
+    const amounts = documents.map(doc => Number(doc.amount) || 0);
+    const totalValue = amounts.reduce((sum, value) => sum + value, 0);
+    const positiveAmounts = amounts.filter(value => value > 0).sort((a, b) => a - b);
+    const averageValue = amounts.length ? totalValue / amounts.length : 0;
+    const medianValue = positiveAmounts.length ? positiveAmounts[Math.floor((positiveAmounts.length - 1) / 2)] : 0;
+    const highestDoc = documents.reduce((best, doc) => (Number(doc.amount) || 0) > (Number(best?.amount) || 0) ? doc : best, null);
+    const lowestPositive = positiveAmounts.length ? positiveAmounts[0] : 0;
+    const types = new Map(), months = new Map();
+    documents.forEach(doc => {
+        const docType = doc.document_type || "غير محدد";
+        types.set(docType, (types.get(docType) || 0) + 1);
+        const month = String(doc.document_date || doc.created_at || "").slice(0, 7);
+        if (month) {
+            const entry = months.get(month) || {value:0, count:0};
+            entry.value += Number(doc.amount) || 0;
+            entry.count += 1;
+            months.set(month, entry);
+        }
+    });
+    const typeEntries = [...types.entries()].map(([label, value]) => ({label, value})).sort((a,b) => b.value - a.value);
+    const allMonthEntries = [...months.entries()].sort((a,b) => a[0].localeCompare(b[0])).map(([label, data]) => ({label, ...data}));
+    const monthLabels = allMonthEntries.slice(-12).map(entry => ({...entry, label: entry.label.replace("-", "/")}));
+    const monthlyRows = allMonthEntries.length ? allMonthEntries.slice().reverse().map(entry => {
+        const share = totalValue ? entry.value / totalValue * 100 : 0;
+        return `<tr><td>${escapeHtml(entry.label.replace("-", "/"))}</td><td class="number">${entry.count.toLocaleString("ar-EG")}</td><td class="number">${formatAnalyticsMoney(entry.value)}</td><td class="number">${formatAnalyticsMoney(entry.value / entry.count)}</td><td class="analytics-share"><span class="analytics-share-bar"><span style="width:${Math.max(share ? 3 : 0, Math.round(share))}%"></span></span>${share.toFixed(1)}%</td></tr>`;
+    }).join("") : `<tr><td colspan="5" class="analytics-empty">لا توجد بيانات شهرية.</td></tr>`;
+    const topMonth = allMonthEntries.reduce((best, entry) => !best || entry.value > best.value ? entry : best, null);
+    const activeFilters = [from && `من ${from}`, to && `إلى ${to}`, type, status].filter(Boolean).join(" — ");
+
+    content.innerHTML = `${analyticsFilterControls(analyticsDocumentsCache)}
+        <div class="analytics-filter-result">${activeFilters ? `نتيجة الفلترة: ${escapeHtml(activeFilters)}` : "التحليل على كل مستندات الشركة"}</div>
+        <div class="analytics-kpis"><div class="analytics-kpi"><span>إجمالي عدد المستندات</span><strong>${documents.length.toLocaleString("ar-EG")}</strong></div><div class="analytics-kpi"><span>إجمالي القيم المالية</span><strong>${formatAnalyticsMoney(totalValue)}</strong></div></div>
+        <section class="analytics-panel"><h3>التحليل المالي التفصيلي</h3><div class="analytics-financial-grid"><div class="analytics-financial-card"><span>متوسط قيمة المستند</span><strong>${formatAnalyticsMoney(averageValue)}</strong></div><div class="analytics-financial-card"><span>الوسيط التقريبي للقيم</span><strong>${formatAnalyticsMoney(medianValue)}</strong></div><div class="analytics-financial-card"><span>أعلى مستند</span><strong>${formatAnalyticsMoney(highestDoc ? highestDoc.amount : 0)}</strong></div><div class="analytics-financial-card"><span>أقل قيمة موجبة</span><strong>${formatAnalyticsMoney(lowestPositive)}</strong></div></div><div class="analytics-empty">${highestDoc ? `أعلى مستند: ${escapeHtml(highestDoc.document_number || highestDoc.document_type || "بدون رقم")} — ${escapeHtml(highestDoc.entity_name || "جهة غير محددة")}` : "لا توجد قيم مالية موجبة للتحليل."}${topMonth ? ` | أعلى شهر: ${escapeHtml(topMonth.label.replace("-", "/"))} بقيمة ${formatAnalyticsMoney(topMonth.value)}` : ""}</div></section>
+        <div class="analytics-grid"><section class="analytics-panel"><h3>توزيع المستندات حسب النوع</h3>${analyticsBarRows(typeEntries, entry => entry.value.toLocaleString("ar-EG"))}</section><section class="analytics-panel"><h3>اتجاه القيم حسب الشهر — آخر 12 شهرًا</h3>${analyticsBarRows(monthLabels, entry => formatAnalyticsMoney(entry.value))}</section></div>
+        <section class="analytics-panel" style="margin-top:14px;"><h3>التوزيع المالي الشهري التفصيلي</h3><div class="analytics-table-wrap"><table class="analytics-table"><thead><tr><th>الشهر</th><th>عدد المستندات</th><th>إجمالي الشهر</th><th>متوسط الشهر</th><th>نسبة من الإجمالي</th></tr></thead><tbody>${monthlyRows}</tbody></table></div></section>`;
+}
+
+function applyAnalyticsFilters() {
+    renderAnalyticsDashboard();
+}
+
+function resetAnalyticsFilters() {
+    ["analytics-from", "analytics-to"].forEach(id => { if ($(id)) $(id).value = ""; });
+    ["analytics-type", "analytics-status"].forEach(id => { if ($(id)) $(id).value = ""; });
+    renderAnalyticsDashboard();
+}
+
+async function openAnalytics() {
+    const dialog = $("analytics-dialog");
+    const content = $("analytics-content");
+    if (!currentOrganizationId) { alert("لا توجد شركة مرتبطة بهذا المستخدم"); return; }
+    if (dialog && !dialog.open) dialog.showModal();
+    content.innerHTML = `<div class="empty">جاري تحميل كل مستندات الشركة وتحليلها...</div>`;
+    try {
+        analyticsDocumentsCache = await fetchAllOrganizationDocumentsForAnalytics();
+        renderAnalyticsDashboard();
+        $("analytics-updated").textContent = `عدد السجلات: ${analyticsDocumentsCache.length.toLocaleString("ar-EG")}`;
+    } catch (error) {
+        console.error("Analytics error", error);
+        content.innerHTML = `<div class="smart-review-item critical"><strong>تعذر تحميل التحليلات</strong>تأكد من الاتصال والصلاحيات ثم حاول مرة أخرى.</div>`;
+    }
+}
+
+function closeSmartReview() {
+    const dialog = $("smart-review-dialog");
+    if (dialog && dialog.open) dialog.close();
+}
+
+async function runSmartReview() {
+    const list = $("smart-review-list");
+    const summary = $("smart-review-summary");
+    const issues = [];
+    let items = [];
+    const entity = $("entity-name").value.trim();
+    const documentNumber = $("document-number").value.trim();
+    const sourceUrl = $("source-url").value.trim();
+    const enteredAmount = Number($("amount").value);
+
+    if (!entity) issues.push({type:"critical", title:"اسم الجهة ناقص", text:"اكتب اسم العميل أو الجهة قبل الحفظ."});
+    if (!documentNumber) issues.push({type:"warning", title:"الرقم الداخلي غير موجود", text:"يمكن الحفظ بدونه، لكن وجوده يسهل البحث ومنع التكرار."});
+    if (sourceUrl && !/^https?:\/\//i.test(sourceUrl)) issues.push({type:"warning", title:"رابط المصدر يحتاج مراجعة", text:"يفضل أن يبدأ الرابط بـ https:// أو http://."});
+
+    try {
+        items = getItemsFromEditor();
+        if (!items.length) {
+            issues.push({type:"critical", title:"لا توجد بنود", text:"أضف بندًا واحدًا على الأقل."});
+        } else {
+            items.forEach((item, index) => {
+                if (!item.name) issues.push({type:"warning", title:`البند ${index + 1} بلا بيان`, text:"اكتب اسم الصنف أو وصف البند."});
+                if (!(Number(item.quantity) > 0)) issues.push({type:"warning", title:`كمية البند ${index + 1}`, text:"الكمية صفر أو غير مكتملة."});
+                if (!(Number(item.price) >= 0)) issues.push({type:"warning", title:`سعر البند ${index + 1}`, text:"راجع سعر الوحدة."});
+            });
+        }
+    } catch (error) {
+        issues.push({type:"critical", title:"خطأ في جدول البنود", text:error.message});
+    }
+
+    const calculatedTotal = items.reduce((sum, item) => sum + Number(item.total || 0), 0);
+    if (Number.isFinite(enteredAmount) && enteredAmount > 0 && Math.abs(enteredAmount - calculatedTotal) > 0.01) {
+        issues.push({type:"warning", title:"اختلاف في الإجمالي", text:`القيمة المدخلة ${enteredAmount.toFixed(2)} بينما مجموع البنود ${calculatedTotal.toFixed(2)}. سيتم اعتماد مجموع البنود عند الحفظ.`});
+    }
+
+    if (documentNumber && currentOrganizationId) {
+        const result = await db.from("business_documents")
+            .select("id,document_number,entity_name")
+            .eq("organization_id", currentOrganizationId)
+            .eq("document_number", documentNumber)
+            .limit(5);
+        if (result.error) {
+            issues.push({type:"warning", title:"تعذر فحص التكرار", text:"لم يتم تغيير أي بيانات، لكن تعذر الاتصال بفحص المستندات المتشابهة."});
+        } else {
+            const duplicates = (result.data || []).filter(row => String(row.id) !== String(editingDocumentId || ""));
+            if (duplicates.length) issues.push({type:"warning", title:"احتمال وجود مستند مكرر", text:`يوجد مستند آخر بنفس الرقم الداخلي (${documentNumber}) للجهة: ${duplicates.map(row => row.entity_name || "غير محددة").join("، ")}.`});
+        }
+    }
+
+    if (!issues.length) issues.push({type:"ok", title:"المستند جاهز مبدئيًا", text:"لم تظهر مشكلات واضحة في الحقول أو جدول البنود."});
+    const criticalCount = issues.filter(issue => issue.type === "critical").length;
+    summary.textContent = criticalCount ? `تم العثور على ${criticalCount} ملاحظة أساسية. أصلحها قبل الحفظ.` : "تمت المراجعة دون تعديل أو حفظ تلقائي. يمكنك العودة للنموذج واتخاذ القرار.";
+    list.innerHTML = issues.map(issue => `<div class="smart-review-item ${issue.type}"><strong>${escapeHtml(issue.title)}</strong>${escapeHtml(issue.text)}</div>`).join("");
+    const dialog = $("smart-review-dialog");
+    if (dialog && !dialog.open) dialog.showModal();
+}
+
 /* حفظ مستند */
 async function saveDocument() {
     const entity =
@@ -3822,14 +4141,7 @@ function normalizeTextStyle(value) {
     return "";
 }
 
-function printDetails() {
-    window.print();
-}
-
-function exportPdf() {
-    // من نافذة الطباعة اختر: Save as PDF / حفظ كملف PDF
-    window.print();
-}
+let currentDetailsRecord = null;
 
 function openDetails(id) {
     const record = currentDocuments.find(
@@ -3839,6 +4151,8 @@ function openDetails(id) {
     if (!record) {
         return;
     }
+
+    currentDetailsRecord = record;
 
     const items = Array.isArray(record.items)
         ? record.items
