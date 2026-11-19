@@ -2325,7 +2325,7 @@ dialog#analytics-dialog[open] .analytics-modal {
         </button>
 
         <button class="secondary-button" type="button" onclick="openAnalytics()">
-            التحليلات والرسوم
+            لوحة متابعة نشاط المستندات وجودة البيانات
         </button>
 
         <span id="filter-message" class="message"></span>
@@ -2362,7 +2362,7 @@ dialog#analytics-dialog[open] .analytics-modal {
 <dialog id="analytics-dialog">
     <div class="analytics-modal">
         <div class="modal-header">
-            <h2>التحليلات والرسوم البيانية</h2>
+            <h2>لوحة متابعة نشاط المستندات وجودة البيانات</h2>
             <div style="display:flex;gap:8px;align-items:center;">
                 <span id="analytics-updated" class="message"></span>
                 <button class="close-button" type="button" onclick="closeAnalytics()">إغلاق</button>
@@ -3804,7 +3804,7 @@ async function fetchAllOrganizationDocumentsForAnalytics() {
     while (true) {
         if (content) content.innerHTML = `<div class="empty">جاري تحميل البيانات — تم تحليل ${all.length.toLocaleString("ar-EG")} سجل حتى الآن...</div>`;
         const result = await db.from("business_documents")
-            .select("id,document_type,document_number,entity_name,status,amount,document_date,created_at")
+            .select("id,document_type,document_number,entity_name,status,document_date,created_at,source_url,notes,items")
             .eq("organization_id", currentOrganizationId)
             .order("document_date", { ascending: true })
             .range(from, from + pageSize - 1);
@@ -3817,25 +3817,32 @@ async function fetchAllOrganizationDocumentsForAnalytics() {
     return all;
 }
 
-function formatAnalyticsMoney(value) {
-    return Number(value || 0).toLocaleString("ar-EG", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+function countEntries(documents, getter) {
+    const counts = new Map();
+    documents.forEach(doc => {
+        const label = getter(doc) || "غير محدد";
+        counts.set(label, (counts.get(label) || 0) + 1);
+    });
+    return [...counts.entries()]
+        .map(([label, value]) => ({label, value}))
+        .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label, "ar"));
 }
 
-function analyticsBarRows(entries, formatter) {
+function analyticsBarRows(entries, formatter = value => value.toLocaleString("ar-EG")) {
     if (!entries.length) return `<div class="analytics-empty">لا توجد بيانات كافية للعرض.</div>`;
     const max = Math.max(...entries.map(entry => entry.value), 1);
     return entries.map(entry => `<div class="analytics-row">
         <span class="analytics-row-label" title="${escapeHtml(entry.label)}">${escapeHtml(entry.label)}</span>
         <div class="analytics-bar"><span style="width:${Math.max(3, Math.round(entry.value / max * 100))}%"></span></div>
-        <span class="analytics-row-value">${formatter(entry)}</span>
+        <span class="analytics-row-value">${formatter(entry.value)}</span>
     </div>`).join("");
 }
 
 let analyticsDocumentsCache = [];
 
 function analyticsFilterControls(documents) {
-    const types = [...new Set(documents.map(doc => doc.document_type || "غير محدد"))].sort();
-    const statuses = [...new Set(documents.map(doc => doc.status || "غير محدد"))].sort();
+    const types = [...new Set(documents.map(doc => doc.document_type || "غير محدد"))].sort((a,b) => a.localeCompare(b, "ar"));
+    const statuses = [...new Set(documents.map(doc => doc.status || "غير محدد"))].sort((a,b) => a.localeCompare(b, "ar"));
     return `<div class="analytics-filter-bar">
         <div><label for="analytics-from">من تاريخ</label><input id="analytics-from" type="date"></div>
         <div><label for="analytics-to">إلى تاريخ</label><input id="analytics-to" type="date"></div>
@@ -3855,46 +3862,80 @@ function renderAnalyticsDashboard() {
         const date = String(doc.document_date || doc.created_at || "").slice(0, 10);
         return (!from || date >= from) && (!to || date <= to) && (!type || (doc.document_type || "غير محدد") === type) && (!status || (doc.status || "غير محدد") === status);
     });
-    const amounts = documents.map(doc => Number(doc.amount) || 0);
-    const totalValue = amounts.reduce((sum, value) => sum + value, 0);
-    const positiveAmounts = amounts.filter(value => value > 0).sort((a, b) => a - b);
-    const averageValue = amounts.length ? totalValue / amounts.length : 0;
-    const medianValue = positiveAmounts.length ? positiveAmounts[Math.floor((positiveAmounts.length - 1) / 2)] : 0;
-    const highestDoc = documents.reduce((best, doc) => (Number(doc.amount) || 0) > (Number(best?.amount) || 0) ? doc : best, null);
-    const lowestPositive = positiveAmounts.length ? positiveAmounts[0] : 0;
-    const types = new Map(), months = new Map();
+
+    const types = countEntries(documents, doc => doc.document_type);
+    const statuses = countEntries(documents, doc => doc.status);
+    const entities = countEntries(documents, doc => doc.entity_name).slice(0, 10);
+    const months = new Map();
     documents.forEach(doc => {
-        const docType = doc.document_type || "غير محدد";
-        types.set(docType, (types.get(docType) || 0) + 1);
         const month = String(doc.document_date || doc.created_at || "").slice(0, 7);
-        if (month) {
-            const entry = months.get(month) || {value:0, count:0};
-            entry.value += Number(doc.amount) || 0;
-            entry.count += 1;
-            months.set(month, entry);
-        }
+        if (month) months.set(month, (months.get(month) || 0) + 1);
     });
-    const typeEntries = [...types.entries()].map(([label, value]) => ({label, value})).sort((a,b) => b.value - a.value);
-    const allMonthEntries = [...months.entries()].sort((a,b) => a[0].localeCompare(b[0])).map(([label, data]) => ({label, ...data}));
-    const monthLabels = allMonthEntries.slice(-12).map(entry => ({...entry, label: entry.label.replace("-", "/")}));
-    const monthlyRows = allMonthEntries.length ? allMonthEntries.slice().reverse().map(entry => {
-        const share = totalValue ? entry.value / totalValue * 100 : 0;
-        return `<tr><td>${escapeHtml(entry.label.replace("-", "/"))}</td><td class="number">${entry.count.toLocaleString("ar-EG")}</td><td class="number">${formatAnalyticsMoney(entry.value)}</td><td class="number">${formatAnalyticsMoney(entry.value / entry.count)}</td><td class="analytics-share"><span class="analytics-share-bar"><span style="width:${Math.max(share ? 3 : 0, Math.round(share))}%"></span></span>${share.toFixed(1)}%</td></tr>`;
-    }).join("") : `<tr><td colspan="5" class="analytics-empty">لا توجد بيانات شهرية.</td></tr>`;
-    const topMonth = allMonthEntries.reduce((best, entry) => !best || entry.value > best.value ? entry : best, null);
+    const monthlyEntries = [...months.entries()].sort((a,b) => a[0].localeCompare(b[0])).map(([label, value]) => ({label: label.replace("-", "/"), value}));
+    const recentCutoff = new Date();
+    recentCutoff.setDate(recentCutoff.getDate() - 30);
+    const recentCount = documents.filter(doc => {
+        const date = new Date(doc.document_date || doc.created_at || "");
+        return !Number.isNaN(date.getTime()) && date >= recentCutoff;
+    }).length;
+    const quality = {
+        noNumber: documents.filter(doc => !String(doc.document_number || "").trim()).length,
+        noEntity: documents.filter(doc => !String(doc.entity_name || "").trim()).length,
+        noDate: documents.filter(doc => !String(doc.document_date || doc.created_at || "").trim()).length,
+        noItems: documents.filter(doc => !Array.isArray(doc.items) || doc.items.length === 0).length,
+        noSource: documents.filter(doc => !String(doc.source_url || "").trim()).length,
+        noNotes: documents.filter(doc => !String(doc.notes || "").trim()).length
+    };
+    const numberMap = new Map();
+    documents.forEach(doc => {
+        const number = String(doc.document_number || "").trim();
+        if (number) numberMap.set(number, (numberMap.get(number) || 0) + 1);
+    });
+    const duplicateGroups = [...numberMap.values()].filter(count => count > 1);
+    const duplicateCards = duplicateGroups.reduce((sum, count) => sum + count, 0);
+    const qualityEntries = [
+        {label:"بدون رقم داخلي", value:quality.noNumber},
+        {label:"بدون جهة أو عميل", value:quality.noEntity},
+        {label:"بدون تاريخ", value:quality.noDate},
+        {label:"بدون بنود", value:quality.noItems},
+        {label:"بدون رابط مصدر", value:quality.noSource},
+        {label:"بدون ملاحظات", value:quality.noNotes}
+    ];
     const activeFilters = [from && `من ${from}`, to && `إلى ${to}`, type, status].filter(Boolean).join(" — ");
+    const currentMonth = monthlyEntries.length ? monthlyEntries[monthlyEntries.length - 1] : {label:"—", value:0};
+    const topType = types[0] || {label:"—", value:0};
+    const topEntity = entities[0] || {label:"—", value:0};
 
     content.innerHTML = `${analyticsFilterControls(analyticsDocumentsCache)}
         <div class="analytics-filter-result">${activeFilters ? `نتيجة الفلترة: ${escapeHtml(activeFilters)}` : "التحليل على كل مستندات الشركة"}</div>
-        <div class="analytics-kpis"><div class="analytics-kpi"><span>إجمالي عدد المستندات</span><strong>${documents.length.toLocaleString("ar-EG")}</strong></div><div class="analytics-kpi"><span>إجمالي القيم المالية</span><strong>${formatAnalyticsMoney(totalValue)}</strong></div></div>
-        <section class="analytics-panel"><h3>التحليل المالي التفصيلي</h3><div class="analytics-financial-grid"><div class="analytics-financial-card"><span>متوسط قيمة المستند</span><strong>${formatAnalyticsMoney(averageValue)}</strong></div><div class="analytics-financial-card"><span>الوسيط التقريبي للقيم</span><strong>${formatAnalyticsMoney(medianValue)}</strong></div><div class="analytics-financial-card"><span>أعلى مستند</span><strong>${formatAnalyticsMoney(highestDoc ? highestDoc.amount : 0)}</strong></div><div class="analytics-financial-card"><span>أقل قيمة موجبة</span><strong>${formatAnalyticsMoney(lowestPositive)}</strong></div></div><div class="analytics-empty">${highestDoc ? `أعلى مستند: ${escapeHtml(highestDoc.document_number || highestDoc.document_type || "بدون رقم")} — ${escapeHtml(highestDoc.entity_name || "جهة غير محددة")}` : "لا توجد قيم مالية موجبة للتحليل."}${topMonth ? ` | أعلى شهر: ${escapeHtml(topMonth.label.replace("-", "/"))} بقيمة ${formatAnalyticsMoney(topMonth.value)}` : ""}</div></section>
-        <div class="analytics-grid"><section class="analytics-panel"><h3>توزيع المستندات حسب النوع</h3>${analyticsBarRows(typeEntries, entry => entry.value.toLocaleString("ar-EG"))}</section><section class="analytics-panel"><h3>اتجاه القيم حسب الشهر — آخر 12 شهرًا</h3>${analyticsBarRows(monthLabels, entry => formatAnalyticsMoney(entry.value))}</section></div>
-        <section class="analytics-panel" style="margin-top:14px;"><h3>التوزيع المالي الشهري التفصيلي</h3><div class="analytics-table-wrap"><table class="analytics-table"><thead><tr><th>الشهر</th><th>عدد المستندات</th><th>إجمالي الشهر</th><th>متوسط الشهر</th><th>نسبة من الإجمالي</th></tr></thead><tbody>${monthlyRows}</tbody></table></div></section>`;
+        <div class="analytics-kpis">
+            <div class="analytics-kpi"><span>إجمالي المستندات</span><strong>${documents.length.toLocaleString("ar-EG")}</strong></div>
+            <div class="analytics-kpi"><span>المستندات خلال آخر 30 يومًا</span><strong>${recentCount.toLocaleString("ar-EG")}</strong></div>
+        </div>
+        <section class="analytics-panel"><h3>ملخص النشاط الذكي</h3>
+            <div class="analytics-financial-grid">
+                <div class="analytics-financial-card"><span>أكثر نوع استخدامًا</span><strong>${escapeHtml(topType.label)} (${topType.value.toLocaleString("ar-EG")})</strong></div>
+                <div class="analytics-financial-card"><span>أكثر جهة نشاطًا</span><strong>${escapeHtml(topEntity.label)} (${topEntity.value.toLocaleString("ar-EG")})</strong></div>
+                <div class="analytics-financial-card"><span>نشاط آخر شهر مسجل</span><strong>${escapeHtml(currentMonth.label)} (${currentMonth.value.toLocaleString("ar-EG")})</strong></div>
+                <div class="analytics-financial-card"><span>مجموعات الأرقام المكررة</span><strong>${duplicateGroups.length.toLocaleString("ar-EG")}</strong></div>
+            </div>
+        </section>
+        <div class="analytics-grid">
+            <section class="analytics-panel"><h3>توزيع المستندات حسب النوع</h3>${analyticsBarRows(types)}</section>
+            <section class="analytics-panel"><h3>توزيع المستندات حسب الحالة</h3>${analyticsBarRows(statuses)}</section>
+            <section class="analytics-panel"><h3>النشاط الشهري بعدد المستندات</h3>${analyticsBarRows(monthlyEntries.slice(-12))}</section>
+            <section class="analytics-panel"><h3>أكثر الجهات نشاطًا — أعلى 10</h3>${analyticsBarRows(entities)}</section>
+        </div>
+        <section class="analytics-panel" style="margin-top:14px;"><h3>جودة واكتمال البيانات</h3>${analyticsBarRows(qualityEntries)}</section>
+        <section class="analytics-panel" style="margin-top:14px;"><h3>جدول النشاط الشهري</h3><div class="analytics-table-wrap"><table class="analytics-table"><thead><tr><th>الشهر</th><th>عدد المستندات</th><th>النسبة من النشاط</th></tr></thead><tbody>${monthlyEntries.length ? monthlyEntries.slice().reverse().map(entry => `<tr><td>${escapeHtml(entry.label)}</td><td class="number">${entry.value.toLocaleString("ar-EG")}</td><td class="analytics-share"><span class="analytics-share-bar"><span style="width:${documents.length ? Math.max(3, Math.round(entry.value / documents.length * 100)) : 0}%"></span></span>${documents.length ? (entry.value / documents.length * 100).toFixed(1) : "0.0"}%</td></tr>`).join("") : `<tr><td colspan="3" class="analytics-empty">لا توجد بيانات شهرية.</td></tr>`}</tbody></table></div></section>
+        <section class="analytics-panel" style="margin-top:14px;"><h3>تنبيهات المتابعة</h3><div class="smart-review-list">
+            <div class="smart-review-item ${quality.noNumber ? "warning" : "ok"}"><strong>الأرقام الداخلية</strong>${quality.noNumber ? `يوجد ${quality.noNumber.toLocaleString("ar-EG")} مستندًا بلا رقم داخلي.` : "كل المستندات تحتوي على رقم داخلي."}</div>
+            <div class="smart-review-item ${duplicateGroups.length ? "warning" : "ok"}"><strong>التكرار المحتمل</strong>${duplicateGroups.length ? `تم العثور على ${duplicateGroups.length.toLocaleString("ar-EG")} رقمًا مكررًا، بإجمالي ${duplicateCards.toLocaleString("ar-EG")} بطاقة.` : "لا توجد أرقام داخلية مكررة ضمن البيانات المحللة."}</div>
+            <div class="smart-review-item ${quality.noItems ? "warning" : "ok"}"><strong>البنود</strong>${quality.noItems ? `يوجد ${quality.noItems.toLocaleString("ar-EG")} مستندًا بلا بنود.` : "كل المستندات تحتوي على بنود مسجلة."}</div>
+        </div></section>`;
 }
 
-function applyAnalyticsFilters() {
-    renderAnalyticsDashboard();
-}
+function applyAnalyticsFilters() { renderAnalyticsDashboard(); }
 
 function resetAnalyticsFilters() {
     ["analytics-from", "analytics-to"].forEach(id => { if ($(id)) $(id).value = ""; });
@@ -3907,14 +3948,14 @@ async function openAnalytics() {
     const content = $("analytics-content");
     if (!currentOrganizationId) { alert("لا توجد شركة مرتبطة بهذا المستخدم"); return; }
     if (dialog && !dialog.open) dialog.showModal();
-    content.innerHTML = `<div class="empty">جاري تحميل كل مستندات الشركة وتحليلها...</div>`;
+    content.innerHTML = `<div class="empty">جاري تحميل كل مستندات الشركة وتحليل نشاطها وجودة بياناتها...</div>`;
     try {
         analyticsDocumentsCache = await fetchAllOrganizationDocumentsForAnalytics();
         renderAnalyticsDashboard();
         $("analytics-updated").textContent = `عدد السجلات: ${analyticsDocumentsCache.length.toLocaleString("ar-EG")}`;
     } catch (error) {
         console.error("Analytics error", error);
-        content.innerHTML = `<div class="smart-review-item critical"><strong>تعذر تحميل التحليلات</strong>تأكد من الاتصال والصلاحيات ثم حاول مرة أخرى.</div>`;
+        content.innerHTML = `<div class="smart-review-item critical"><strong>تعذر تحميل لوحة المتابعة</strong>تأكد من الاتصال والصلاحيات ثم حاول مرة أخرى.</div>`;
     }
 }
 
