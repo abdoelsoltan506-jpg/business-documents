@@ -248,6 +248,32 @@ button {
     color: #1d4ed8;
 }
 
+/* إضافات تشغيلية: لا تغيّر تخطيط البطاقة الأساسي */
+.quick-entry-toolbar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:12px; }
+.quick-entry-note { color:var(--muted); font-size:.78rem; }
+.quick-entry-mode .quick-optional { display:none !important; }
+.followup-panel { background:linear-gradient(135deg,#ffffff,#f7fbff); }
+.followup-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+.followup-card { border:1px solid var(--line); background:#fff; border-radius:11px; padding:12px; text-align:right; cursor:pointer; transition:.15s; }
+.followup-card:hover { border-color:#93b4e8; transform:translateY(-1px); }
+.followup-card span { display:block; color:var(--muted); font-size:.72rem; }
+.followup-card strong { display:block; color:var(--navy); font-size:1.35rem; margin-top:5px; }
+.followup-card.warning strong { color:var(--orange); }
+.followup-card.danger strong { color:var(--red); }
+.card-status-control { margin-top:12px; display:flex; gap:8px; align-items:center; }
+.card-status-control label { margin:0; white-space:nowrap; }
+.card-status-control select { padding:8px; }
+.data-quality-box { margin-top:12px; padding:10px; border-radius:9px; background:#fff8e8; border:1px solid #f3d79b; color:#7a5200; font-size:.76rem; }
+.data-quality-box.complete { background:#eefaf3; border-color:#b8e2c8; color:#146c43; }
+.quick-filter-bar { display:flex; gap:7px; flex-wrap:wrap; margin-top:12px; }
+.quick-filter-bar button { border:1px solid var(--line); background:#fff; color:var(--navy); border-radius:20px; padding:8px 12px; font-size:.76rem; }
+.quick-filter-bar button.active { background:#e7f0ff; border-color:#8db0ec; color:#1d4ed8; font-weight:bold; }
+@media (max-width:760px) {
+    .followup-grid { grid-template-columns:repeat(2,1fr); }
+    .followup-card:last-child { grid-column:1 / -1; }
+}
+
+
 .empty {
     background: white;
     border: 1px dashed var(--line);
@@ -2126,6 +2152,10 @@ dialog#analytics-dialog[open] .analytics-modal {
 <section id="input-panel" class="panel">
 
     <h2>إدخال مستند جديد</h2>
+    <div class="quick-entry-toolbar">
+        <button type="button" id="quick-entry-button" class="secondary-button" onclick="toggleQuickEntry()">إضافة سريعة</button>
+        <span id="quick-entry-note" class="quick-entry-note">تسجيل أولي سريع: النوع والرقم والجهة والحالة فقط، ويمكن استكمال البيانات لاحقًا.</span>
+    </div>
 
     <div class="form-grid">
 
@@ -2170,22 +2200,22 @@ dialog#analytics-dialog[open] .analytics-modal {
             </select>
         </div>
 
-        <div>
+        <div class="quick-optional">
             <label>القيمة</label>
             <input id="amount" type="number" step="0.01">
         </div>
 
-        <div>
+        <div class="quick-optional">
             <label>من / بداية الفترة</label>
             <input id="period-from">
         </div>
 
-        <div>
+        <div class="quick-optional">
             <label>إلى / نهاية الفترة</label>
             <input id="period-to">
         </div>
 
-        <div class="full-width items-section">
+        <div class="full-width items-section quick-optional">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;">
         <label style="margin:0;">بنود المستند</label>
         <button type="button" class="secondary-button" onclick="addItemRow()" style="padding:7px 10px;font-size:.78rem;">+ إضافة بند</button>
@@ -2197,12 +2227,12 @@ dialog#analytics-dialog[open] .analytics-modal {
     </div>
 </div>
 
-        <div class="full-width">
+        <div class="full-width quick-optional">
             <label>رابط المصدر أو المرفق</label>
             <input id="source-url" type="url">
         </div>
 
-        <div class="full-width">
+        <div class="full-width quick-optional">
             <label>ملاحظات وشروط</label>
             <textarea id="notes" placeholder="اكتب كل ملاحظة أو شرط في سطر مستقل...
 مثال:
@@ -2210,7 +2240,7 @@ dialog#analytics-dialog[open] .analytics-modal {
 2. السعر شامل الضريبة"></textarea>
         </div>
 
-        <div class="full-width print-settings-section">
+        <div class="full-width print-settings-section quick-optional">
             <h3 class="print-fields-title">الهيدر — ثلاثة أجزاء مستقلة</h3>
             <div class="print-parts-grid">
                 <div><label for="header-right">الهيدر الأيمن</label><textarea id="header-right" placeholder="اسم الشركة أو الشعار أو العنوان"></textarea><select id="header-right-style"><option value="normal">عادي</option><option value="bold">عريض</option><option value="underline">تحته خط</option><option value="bold-underline">عريض وتحته خط</option></select></div>
@@ -2219,15 +2249,15 @@ dialog#analytics-dialog[open] .analytics-modal {
             </div>
             <small class="compatibility-note">المستندات القديمة التي تحتوي على الهيدر السابق ستظهر تلقائيًا في الجزء الأوسط.</small>
         </div>
-        <div class="full-width">
+        <div class="full-width quick-optional">
             <label>مقدمة أو شرح المستند (اختياري)</label>
             <textarea id="intro-text" placeholder="مثال: يسعدنا أن نقدم لكم عرض السعر التالي..."></textarea>
         </div>
-        <div class="full-width">
+        <div class="full-width quick-optional">
             <label>الخاتمة</label>
             <textarea id="conclusion-text" placeholder="وتقبلوا فائق الاحترام والتقدير"></textarea>
         </div>
-        <div class="full-width print-settings-section">
+        <div class="full-width print-settings-section quick-optional">
             <h3 class="print-fields-title">الفوتر — ثلاثة أجزاء مستقلة</h3>
             <div class="print-parts-grid">
                 <div><label for="footer-right">الفوتر الأيمن</label><textarea id="footer-right" placeholder="العنوان أو الهاتف"></textarea><select id="footer-right-style"><option value="normal">عادي</option><option value="bold">عريض</option><option value="underline">تحته خط</option><option value="bold-underline">عريض وتحته خط</option></select></div>
@@ -2253,6 +2283,26 @@ dialog#analytics-dialog[open] .analytics-modal {
 
         <span id="form-message" class="message"></span>
     </div>
+</section>
+
+<!-- لوحة ما يحتاج إلى متابعة -->
+<section class="panel followup-panel">
+    <h2>ما يحتاج إلى متابعة</h2>
+    <div class="followup-grid">
+        <button type="button" class="followup-card" onclick="applyQuickFilter('all')"><span>كل المستندات</span><strong id="followup-all">—</strong></button>
+        <button type="button" class="followup-card warning" onclick="applyQuickFilter('open')"><span>مفتوح</span><strong id="followup-open">—</strong></button>
+        <button type="button" class="followup-card warning" onclick="applyQuickFilter('review')"><span>قيد المراجعة</span><strong id="followup-review">—</strong></button>
+        <button type="button" class="followup-card danger" onclick="applyQuickFilter('incomplete')"><span>بيانات ناقصة</span><strong id="followup-incomplete">—</strong></button>
+        <button type="button" class="followup-card danger" onclick="applyQuickFilter('stale')"><span>لم تُحدّث منذ 30 يومًا</span><strong id="followup-stale">—</strong></button>
+        <button type="button" class="followup-card" onclick="applyQuickFilter('recent7')"><span>أُضيف خلال 7 أيام</span><strong id="followup-recent7">—</strong></button>
+        <button type="button" class="followup-card" onclick="applyQuickFilter('recent')"><span>أُضيف خلال 30 يومًا</span><strong id="followup-recent">—</strong></button>
+    </div>
+    <div class="actions" style="margin-top:12px;">
+        <button type="button" class="primary-button" onclick="refreshFollowupSummary(true)">تحديث ملخص المتابعة</button>
+        <button type="button" class="secondary-button" onclick="openAnalytics()">تحليل تفصيلي عند الطلب</button>
+        <span id="followup-updated" class="message"></span>
+    </div>
+    <div id="followup-message" class="message" style="margin-top:10px;">اضغط «تحديث ملخص المتابعة» لتحميل أرقام فقط.</div>
 </section>
 
 <!-- الفلاتر -->
@@ -2330,6 +2380,15 @@ dialog#analytics-dialog[open] .analytics-modal {
 
         <span id="filter-message" class="message"></span>
     </div>
+    <div class="quick-filter-bar" aria-label="فلاتر جاهزة">
+        <button type="button" data-quick-filter="all" onclick="applyQuickFilter('all')">كل المستندات</button>
+        <button type="button" data-quick-filter="open" onclick="applyQuickFilter('open')">مفتوح</button>
+        <button type="button" data-quick-filter="review" onclick="applyQuickFilter('review')">قيد المراجعة</button>
+        <button type="button" data-quick-filter="incomplete" onclick="applyQuickFilter('incomplete')">البيانات الناقصة</button>
+        <button type="button" data-quick-filter="stale" onclick="applyQuickFilter('stale')">القديمة</button>
+        <button type="button" data-quick-filter="recent7" onclick="applyQuickFilter('recent7')">آخر 7 أيام</button>
+        <button type="button" data-quick-filter="recent" onclick="applyQuickFilter('recent')">آخر 30 يومًا</button>
+    </div>
 </section>
 
 <div style="display:flex;justify-content:space-between;">
@@ -2389,6 +2448,7 @@ dialog#analytics-dialog[open] .analytics-modal {
     </div>
 </dialog>
 
+
 <!-- نافذة التفاصيل -->
 <dialog id="details-dialog">
     <div class="modal">
@@ -2426,6 +2486,10 @@ let currentDocuments = [];
 let currentOrganizationId = null;
 let currentOrganizationRole = null;
 let currentCanDelete = false;
+let quickEntryMode = false;
+let activeQuickFilter = "all";
+let followupSummaryCache = null;
+let followupSummaryRequest = 0;
 
 let editingDocumentId = null;
 
@@ -3030,6 +3094,7 @@ function getItemsFromEditor() {
         const name = row.querySelector(".item-name-input").value.trim();
         const quantity = Number(row.querySelector(".item-quantity-input").value || 0);
         const price = Number(row.querySelector(".item-price-input").value || 0);
+        if (quickEntryMode && !name) return;
         if (!name && quantity === 0 && price === 0) return;
         if (!name) throw new Error("اكتب بيان كل بند أو احذف السطر الفارغ");
         items.push({name, quantity, price, total: quantity * price});
@@ -3117,6 +3182,7 @@ if (organizationId) {
 
     await loadFilters();
     await loadDocuments();
+    await refreshFollowupSummary(true);
 
 } catch (error) {
     message.style.color = "var(--red)";
@@ -3300,6 +3366,22 @@ function buildQuery() {
 
     if (year) {
         query = query.eq("document_year", Number(year));
+    }
+
+    if (activeQuickFilter === "open") query = query.eq("status", "مفتوح");
+    if (activeQuickFilter === "review") query = query.eq("status", "قيد المراجعة");
+    if (activeQuickFilter === "recent" || activeQuickFilter === "recent7") {
+        const cutoff = new Date();
+        cutoff.setDate(cutoff.getDate() - (activeQuickFilter === "recent7" ? 7 : 30));
+        query = query.gte("document_date", cutoff.toISOString().slice(0, 10));
+    }
+    if (activeQuickFilter === "stale") {
+        const cutoff = new Date();
+        cutoff.setDate(cutoff.getDate() - 30);
+        query = query.lte("updated_at", cutoff.toISOString());
+    }
+    if (activeQuickFilter === "incomplete") {
+        query = query.or("document_number.is.null,entity_name.is.null,items.eq.[]");
     }
 
     return query;
@@ -3524,6 +3606,125 @@ alert("تم حذف المستند بنجاح");
     await loadDocuments();
 }
 
+/* الميزات التشغيلية الجديدة — تعمل من الواجهة ولا تغيّر SQL */
+function setQuickEntryVisualState() {
+    const panel = $("input-panel");
+    const button = $("quick-entry-button");
+    const note = $("quick-entry-note");
+    if (!panel || !button) return;
+    panel.classList.toggle("quick-entry-mode", quickEntryMode);
+    button.textContent = quickEntryMode ? "إلغاء الإضافة السريعة" : "إضافة سريعة";
+    if (note) note.textContent = quickEntryMode
+        ? "الوضع السريع يخفي التفاصيل الاختيارية فقط؛ بعد الحفظ يمكنك استكمالها من زر تعديل المستند."
+        : "تسجيل أولي سريع: النوع والرقم والجهة والحالة فقط، ويمكن استكمال البيانات لاحقًا.";
+}
+function toggleQuickEntry() {
+    quickEntryMode = !quickEntryMode;
+    if (quickEntryMode) {
+        $("document-status").value = "مفتوح";
+        $("document-number").focus();
+    }
+    setQuickEntryVisualState();
+}
+function documentMissingFields(document) {
+    const missing = [];
+    if (!String(document.document_number || "").trim()) missing.push("الرقم الداخلي");
+    if (!String(document.entity_name || "").trim()) missing.push("الجهة");
+    if (!Array.isArray(document.items) || document.items.length === 0) missing.push("بنود المستند");
+    return missing;
+}
+function applyQuickFilter(filter) {
+    activeQuickFilter = filter || "all";
+    document.querySelectorAll("[data-quick-filter]").forEach(button => button.classList.toggle("active", button.dataset.quickFilter === activeQuickFilter));
+    currentPage = 0;
+    if (filter === "all") {
+        $("search-text").value = ""; $("filter-type").value = ""; $("filter-status").value = "";
+        $("filter-day").value = ""; $("filter-month").value = ""; $("filter-year").value = "";
+    } else if (filter === "open") $("filter-status").value = "مفتوح";
+    else if (filter === "review") $("filter-status").value = "قيد المراجعة";
+    $("filter-message").textContent = filter === "all" ? "تم عرض كل المستندات" : "تم تطبيق الفلتر الجاهز";
+    loadDocuments();
+}
+async function countOrganizationDocuments(configure = null) {
+    let query = db.from("business_documents")
+        .select("id", { count: "exact", head: true })
+        .eq("organization_id", currentOrganizationId);
+    if (configure) query = configure(query);
+    const result = await query;
+    if (result.error) throw result.error;
+    return Number(result.count || 0);
+}
+function dateDaysAgo(days) {
+    const date = new Date();
+    date.setDate(date.getDate() - days);
+    return date;
+}
+async function countIncompleteDocuments() {
+    try {
+        return await countOrganizationDocuments(q => q.or("document_number.is.null,entity_name.is.null,items.eq.[]"));
+    } catch (error) {
+        console.warn("تعذر عد JSONB الفارغ، سيتم استخدام الحقول الأساسية فقط", error);
+        return await countOrganizationDocuments(q => q.or("document_number.is.null,entity_name.is.null"));
+    }
+}
+function renderFollowupNumbers(counts) {
+    Object.entries(counts).forEach(([key, value]) => {
+        const element = $("followup-" + key);
+        if (element) element.textContent = Number(value || 0).toLocaleString("ar-EG");
+    });
+    const message = $("followup-message");
+    const signals = [];
+    if (counts.open) signals.push(`يوجد ${counts.open.toLocaleString("ar-EG")} مستند مفتوح`);
+    if (counts.review) signals.push(`${counts.review.toLocaleString("ar-EG")} مستند قيد المراجعة`);
+    if (counts.incomplete) signals.push(`${counts.incomplete.toLocaleString("ar-EG")} مستند يحتاج استكمالًا`);
+    if (counts.stale) signals.push(`${counts.stale.toLocaleString("ar-EG")} مستند لم يُحدّث منذ 30 يومًا`);
+    if (message) message.textContent = signals.length ? signals.join(" — ") + "." : "لا توجد تنبيهات متابعة أساسية حاليًا.";
+}
+async function refreshFollowupSummary(force = false) {
+    if (!currentOrganizationId) return;
+    const now = Date.now();
+    if (!force && followupSummaryCache && now - followupSummaryCache.time < 60000) {
+        renderFollowupNumbers(followupSummaryCache.counts);
+        return;
+    }
+    const requestId = ++followupSummaryRequest;
+    const message = $("followup-message");
+    const updated = $("followup-updated");
+    if (message) message.textContent = "جاري طلب أرقام الملخص فقط من قاعدة البيانات...";
+    try {
+        const recent7Date = dateDaysAgo(7).toISOString().slice(0, 10);
+        const recent30Date = dateDaysAgo(30).toISOString().slice(0, 10);
+        const staleDate = dateDaysAgo(30).toISOString();
+        const results = await Promise.all([
+            countOrganizationDocuments(),
+            countOrganizationDocuments(q => q.eq("status", "مفتوح")),
+            countOrganizationDocuments(q => q.eq("status", "قيد المراجعة")),
+            countIncompleteDocuments(),
+            countOrganizationDocuments(q => q.lte("updated_at", staleDate)),
+            countOrganizationDocuments(q => q.gte("document_date", recent7Date)),
+            countOrganizationDocuments(q => q.gte("document_date", recent30Date))
+        ]);
+        if (requestId !== followupSummaryRequest) return;
+        const counts = { all:results[0], open:results[1], review:results[2], incomplete:results[3], stale:results[4], recent7:results[5], recent:results[6] };
+        followupSummaryCache = { time: Date.now(), counts };
+        renderFollowupNumbers(counts);
+        if (updated) updated.textContent = `آخر تحديث: ${new Date().toLocaleTimeString("ar-EG", {hour:"2-digit", minute:"2-digit"})}`;
+    } catch (error) {
+        console.error("Follow-up numbers error", error);
+        if (message) message.textContent = "تعذر تحديث الأرقام الآن. لم يتم تحميل المستندات؛ حاول التحديث مرة أخرى.";
+        if (updated) updated.textContent = "لم يكتمل التحديث";
+    }
+}
+async function updateDocumentStatus(documentId, newStatus) {
+    const record = currentDocuments.find(row => String(row.id) === String(documentId));
+    if (!record || !newStatus) return;
+    const result = await db.from("business_documents").update({ status: newStatus }).eq("id", documentId).eq("organization_id", currentOrganizationId);
+    if (result.error) { alert("فشل تغيير الحالة: " + result.error.message); renderCards(); return; }
+    followupSummaryCache = null;
+    await loadDocuments();
+    refreshFollowupSummary(true);
+}
+
 /* عرض البطاقات */
 function renderCards() {
     if (!currentDocuments.length) {
@@ -3666,6 +3867,17 @@ function renderCards() {
                         onclick="openDetails('${document.id}')">
                         فتح التفاصيل
                     </button>
+
+                    <div class="card-status-control">
+                        <label for="card-status-${document.id}">الحالة</label>
+                        <select id="card-status-${document.id}" onchange="updateDocumentStatus('${document.id}', this.value)">
+                            ${["مفتوح","قيد المراجعة","ساري","مغلق","ملغي"].map(status => `<option value="${status}" ${status === document.status ? "selected" : ""}>${status}</option>`).join("")}
+                        </select>
+                    </div>
+
+                    ${(() => { const missing = documentMissingFields(document); return missing.length
+                        ? `<div class="data-quality-box"><strong>بيانات ناقصة:</strong> ${missing.map(item => escapeHtml(item)).join("، ")}<br><button type="button" class="secondary-button" style="padding:6px 9px;margin-top:7px;font-size:.72rem;" onclick="startEditDocument('${document.id}')">استكمال البيانات</button></div>`
+                        : `<div class="data-quality-box complete">البيانات الأساسية مكتملة</div>`; })()}
 
                     <button
                         type="button"
@@ -4051,12 +4263,12 @@ if (!currentOrganizationId) {
         message.textContent = error.message;
         return;
     }
-    if (items.length === 0) {
+    if (items.length === 0 && !quickEntryMode) {
         message.style.color = "var(--red)";
-        message.textContent = "أضف بندًا واحدًا على الأقل";
+        message.textContent = "أضف بندًا واحدًا على الأقل، أو استخدم الإضافة السريعة للتسجيل الأولي";
         return;
     }
-    const amount = items.reduce((sum, item) => sum + item.total, 0);
+    const amount = items.length ? items.reduce((sum, item) => sum + item.total, 0) : null;
     const data = {
         organization_id:
     currentOrganizationId,
@@ -4152,12 +4364,15 @@ if (editingDocumentId) {
     editingDocumentId =
     null;
 
+    followupSummaryCache = null;
     clearForm();
 
+    followupSummaryCache = null;
     await loadFilters();
 
     currentPage = 0;
     await loadDocuments();
+    await refreshFollowupSummary(true);
 }
 
 /* مسح النموذج */
@@ -4168,6 +4383,8 @@ function clearForm() {
     $("amount").value = "";
     $("document-date").value = todayDate();
     setItemsEditor();
+    quickEntryMode = false;
+    setQuickEntryVisualState();
 }
 /* فتح التفاصيل */
 function arabicAmountWords(value) {
@@ -4201,6 +4418,7 @@ function normalizeTextStyle(value) {
 }
 
 let currentDetailsRecord = null;
+
 
 function openDetails(id) {
     const record = currentDocuments.find(
@@ -4250,7 +4468,7 @@ function openDetails(id) {
     const hasHeaderParts = headerRight || headerCenter || headerLeft;
     const hasFooterParts = footerRight || footerCenter || footerLeft;
 
-    $("modal-title").textContent = "عرض المستند";
+    $("modal-title").textContent = "";
 
     $("modal-body").innerHTML = `
         <div class="details-document">
@@ -4408,6 +4626,8 @@ function closeDetails() {
 
 /* تطبيق الفلاتر */
 function applyFilters() {
+    activeQuickFilter = "all";
+    document.querySelectorAll("[data-quick-filter]").forEach(button => button.classList.remove("active"));
     currentPage = 0;
 
     $("filter-message").textContent =
@@ -4418,6 +4638,8 @@ function applyFilters() {
 
 /* عرض كل المستندات مع بقاء التقسيم */
 function showAllDocuments() {
+    activeQuickFilter = "all";
+    document.querySelectorAll("[data-quick-filter]").forEach(button => button.classList.remove("active"));
     $("search-text").value = "";
     $("filter-type").value = "";
     $("filter-status").value = "";
@@ -4487,6 +4709,7 @@ if (organizationId) {
 
     await loadFilters();
     await loadDocuments();
+    await refreshFollowupSummary(true);
 }
 else {
     document
@@ -5001,6 +5224,7 @@ await loadOrganizationMembers();
 }
 
 setItemsEditor();
+setQuickEntryVisualState();
 startApplication();
 
 </script>
