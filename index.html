@@ -259,6 +259,25 @@ button {
 .followup-card span { display:block; color:var(--muted); font-size:.72rem; }
 .followup-card strong { display:block; color:var(--navy); font-size:1.35rem; margin-top:5px; }
 .followup-card.warning strong { color:var(--orange); }
+.followup-card.priority-card { background:#fff7e6; border-color:#f1c36b; }
+.followup-card.priority-card strong { color:#a76500; }
+.activity-panel { margin-top:14px; }
+.activity-list { display:grid; gap:7px; }
+.activity-item { display:flex; justify-content:space-between; gap:10px; align-items:center; padding:9px 10px; border:1px solid var(--line); border-radius:9px; background:#fff; font-size:.78rem; }
+.activity-item strong { color:var(--navy); }
+.activity-item span { color:var(--muted); font-size:.72rem; white-space:nowrap; }
+.activity-columns { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.today-operations-panel { border-top:2px solid #d7e6f8; }
+.operation-card { border:1px solid var(--line); background:#fff; border-radius:11px; padding:12px; text-align:right; cursor:pointer; transition:.15s; }
+.operation-card:hover { border-color:#93b4e8; transform:translateY(-1px); }
+.operation-card span { display:block; color:var(--muted); font-size:.72rem; }
+.operation-card strong { display:block; color:var(--navy); font-size:1.25rem; margin-top:5px; }
+.operation-card.new-operation strong { color:var(--green); }
+.operation-card.edit-operation strong { color:var(--blue); }
+.operation-card.status-operation strong { color:var(--orange); }
+
+@media (max-width:760px) { .activity-columns { grid-template-columns:1fr; } }
+
 .followup-card.danger strong { color:var(--red); }
 .card-status-control { margin-top:12px; display:flex; gap:8px; align-items:center; }
 .card-status-control label { margin:0; white-space:nowrap; }
@@ -2296,6 +2315,7 @@ dialog#analytics-dialog[open] .analytics-modal {
         <button type="button" class="followup-card danger" onclick="applyQuickFilter('stale')"><span>لم تُحدّث منذ 30 يومًا</span><strong id="followup-stale">—</strong></button>
         <button type="button" class="followup-card" onclick="applyQuickFilter('recent7')"><span>أُضيف خلال 7 أيام</span><strong id="followup-recent7">—</strong></button>
         <button type="button" class="followup-card" onclick="applyQuickFilter('recent')"><span>أُضيف خلال 30 يومًا</span><strong id="followup-recent">—</strong></button>
+        <button type="button" class="followup-card priority-card" onclick="applyQuickFilter('priority')"><span>الأولوية اليوم</span><strong id="followup-priority">—</strong></button>
     </div>
     <div class="actions" style="margin-top:12px;">
         <button type="button" class="primary-button" onclick="refreshFollowupSummary(true)">تحديث ملخص المتابعة</button>
@@ -2303,6 +2323,18 @@ dialog#analytics-dialog[open] .analytics-modal {
         <span id="followup-updated" class="message"></span>
     </div>
     <div id="followup-message" class="message" style="margin-top:10px;">اضغط «تحديث ملخص المتابعة» لتحميل أرقام فقط.</div>
+    <section class="activity-panel today-operations-panel">
+        <div class="actions" style="margin-top:8px;">
+            <h3 style="margin:0;color:var(--navy);font-size:.95rem;">عمليات اليوم</h3>
+            <button type="button" class="secondary-button" onclick="loadTodayOperations(true)">تحديث عمليات اليوم</button>
+            <span id="today-operations-updated" class="message"></span>
+        </div>
+        <p class="compatibility-note" style="margin:8px 0 12px;">تصنيف تشغيلي خفيف مبني على سجلات أُضيفت أو عُدّلت اليوم، مع توزيعها حسب الحالة الحالية. لا يتم تحميل كل المستندات.</p>
+        <div id="today-operations-grid" class="followup-grid">
+            <div class="empty" style="padding:18px;grid-column:1/-1;">اضغط «تحديث عمليات اليوم» لطلب أرقام اليوم فقط.</div>
+        </div>
+        <div id="today-operations-message" class="message" style="margin-top:10px;"></div>
+    </section>
 </section>
 
 <!-- الفلاتر -->
@@ -2362,6 +2394,18 @@ dialog#analytics-dialog[open] .analytics-modal {
             </select>
         </div>
 
+        <div>
+            <label>ترتيب المستندات</label>
+            <select id="sort-documents">
+                <option value="newest">الأحدث أولًا</option>
+                <option value="oldest">الأقدم أولًا</option>
+                <option value="stale">الأقدم دون تحديث</option>
+                <option value="open">المفتوح أولًا</option>
+                <option value="review">قيد المراجعة أولًا</option>
+                <option value="incomplete">البيانات الناقصة أولًا</option>
+            </select>
+        </div>
+
     </div>
 
     <div class="actions">
@@ -2388,6 +2432,7 @@ dialog#analytics-dialog[open] .analytics-modal {
         <button type="button" data-quick-filter="stale" onclick="applyQuickFilter('stale')">القديمة</button>
         <button type="button" data-quick-filter="recent7" onclick="applyQuickFilter('recent7')">آخر 7 أيام</button>
         <button type="button" data-quick-filter="recent" onclick="applyQuickFilter('recent')">آخر 30 يومًا</button>
+        <button type="button" data-quick-filter="priority" onclick="applyQuickFilter('priority')">الأولوية اليوم</button>
     </div>
 </section>
 
@@ -2488,6 +2533,7 @@ let currentOrganizationRole = null;
 let currentCanDelete = false;
 let quickEntryMode = false;
 let activeQuickFilter = "all";
+let activeSort = "newest";
 let followupSummaryCache = null;
 let followupSummaryRequest = 0;
 
@@ -3183,6 +3229,7 @@ if (organizationId) {
     await loadFilters();
     await loadDocuments();
     await refreshFollowupSummary(true);
+    await loadTodayOperations();
 
 } catch (error) {
     message.style.color = "var(--red)";
@@ -3318,9 +3365,20 @@ async function logoutUser() {
 function buildQuery() {
     let query = db
         .from("business_documents")
-        .select("*", { count: "exact" })
-        .order("document_date", { ascending: false })
-        .order("created_at", { ascending: false });
+        .select("*", { count: "exact" });
+    if (activeSort === "oldest") {
+        query = query.order("document_date", { ascending: true }).order("created_at", { ascending: true });
+    } else if (activeSort === "stale") {
+        query = query.order("updated_at", { ascending: true }).order("document_date", { ascending: true });
+    } else if (activeSort === "open") {
+        query = query.order("status", { ascending: true }).order("document_date", { ascending: false });
+    } else if (activeSort === "review") {
+        query = query.order("status", { ascending: true }).order("document_date", { ascending: false });
+    } else if (activeSort === "incomplete") {
+        query = query.order("document_number", { ascending: true, nullsFirst: true }).order("entity_name", { ascending: true, nullsFirst: true });
+    } else {
+        query = query.order("document_date", { ascending: false }).order("created_at", { ascending: false });
+    }
 
     const search =
         $("search-text").value.trim();
@@ -3379,6 +3437,21 @@ function buildQuery() {
         const cutoff = new Date();
         cutoff.setDate(cutoff.getDate() - 30);
         query = query.lte("updated_at", cutoff.toISOString());
+    }
+    if (activeQuickFilter === "priority") {
+        const cutoff = new Date();
+        cutoff.setDate(cutoff.getDate() - 30);
+        query = query.or(`status.eq.قيد المراجعة,updated_at.lte.${cutoff.toISOString()},document_number.is.null,entity_name.is.null`);
+    }
+    if (["today-new","today-updated","today-incomplete","today-open","today-review","today-valid","today-closed","today-cancelled"].includes(activeQuickFilter)) {
+        const range = localTodayRange();
+        if (activeQuickFilter === "today-new") query = query.gte("created_at", range.start).lt("created_at", range.end);
+        else {
+            query = query.gte("updated_at", range.start).lt("updated_at", range.end);
+            const statuses = {"today-open":"مفتوح","today-review":"قيد المراجعة","today-valid":"ساري","today-closed":"مغلق","today-cancelled":"ملغي"};
+            if (statuses[activeQuickFilter]) query = query.eq("status", statuses[activeQuickFilter]);
+            if (activeQuickFilter === "today-incomplete") query = query.or("document_number.is.null,entity_name.is.null,items.eq.[]");
+        }
     }
     if (activeQuickFilter === "incomplete") {
         query = query.or("document_number.is.null,entity_name.is.null,items.eq.[]");
@@ -3604,6 +3677,8 @@ alert("تم حذف المستند بنجاح");
     }
 
     await loadDocuments();
+    await refreshFollowupSummary(true);
+    await loadTodayOperations();
 }
 
 /* الميزات التشغيلية الجديدة — تعمل من الواجهة ولا تغيّر SQL */
@@ -3678,6 +3753,7 @@ function renderFollowupNumbers(counts) {
     if (counts.review) signals.push(`${counts.review.toLocaleString("ar-EG")} مستند قيد المراجعة`);
     if (counts.incomplete) signals.push(`${counts.incomplete.toLocaleString("ar-EG")} مستند يحتاج استكمالًا`);
     if (counts.stale) signals.push(`${counts.stale.toLocaleString("ar-EG")} مستند لم يُحدّث منذ 30 يومًا`);
+    if (counts.priority) signals.push(`${counts.priority.toLocaleString("ar-EG")} مستند ضمن الأولوية اليوم`);
     if (message) message.textContent = signals.length ? signals.join(" — ") + "." : "لا توجد تنبيهات متابعة أساسية حاليًا.";
 }
 async function refreshFollowupSummary(force = false) {
@@ -3702,10 +3778,14 @@ async function refreshFollowupSummary(force = false) {
             countIncompleteDocuments(),
             countOrganizationDocuments(q => q.lte("updated_at", staleDate)),
             countOrganizationDocuments(q => q.gte("document_date", recent7Date)),
-            countOrganizationDocuments(q => q.gte("document_date", recent30Date))
+            countOrganizationDocuments(q => q.gte("document_date", recent30Date)),
+            countOrganizationDocuments(q => {
+                const priorityDate = dateDaysAgo(30).toISOString();
+                return q.or(`status.eq.قيد المراجعة,updated_at.lte.${priorityDate},document_number.is.null,entity_name.is.null`);
+            })
         ]);
         if (requestId !== followupSummaryRequest) return;
-        const counts = { all:results[0], open:results[1], review:results[2], incomplete:results[3], stale:results[4], recent7:results[5], recent:results[6] };
+        const counts = { all:results[0], open:results[1], review:results[2], incomplete:results[3], stale:results[4], recent7:results[5], recent:results[6], priority:results[7] };
         followupSummaryCache = { time: Date.now(), counts };
         renderFollowupNumbers(counts);
         if (updated) updated.textContent = `آخر تحديث: ${new Date().toLocaleTimeString("ar-EG", {hour:"2-digit", minute:"2-digit"})}`;
@@ -3713,6 +3793,77 @@ async function refreshFollowupSummary(force = false) {
         console.error("Follow-up numbers error", error);
         if (message) message.textContent = "تعذر تحديث الأرقام الآن. لم يتم تحميل المستندات؛ حاول التحديث مرة أخرى.";
         if (updated) updated.textContent = "لم يكتمل التحديث";
+    }
+}
+function localTodayRange() {
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(start);
+    end.setDate(end.getDate() + 1);
+    return { start: start.toISOString(), end: end.toISOString(), date: start.toISOString().slice(0, 10) };
+}
+function todayOperationCard(label, value, filter, className = "") {
+    return `<button type="button" class="operation-card ${className}" onclick="applyQuickFilter('${filter}')"><span>${label}</span><strong>${Number(value || 0).toLocaleString("ar-EG")}</strong></button>`;
+}
+function renderTodayOperations(counts) {
+    const grid = $("today-operations-grid");
+    if (!grid) return;
+    grid.innerHTML = [
+        todayOperationCard("مستندات أُضيفت اليوم", counts.newToday, "today-new", "new-operation"),
+        todayOperationCard("سجلات عُدّلت اليوم", counts.updatedToday, "today-updated", "edit-operation"),
+        todayOperationCard("تحتاج استكمالًا اليوم", counts.incompleteToday, "today-incomplete", "status-operation"),
+        todayOperationCard("اليوم — مفتوح", counts.openToday, "today-open", "status-operation"),
+        todayOperationCard("اليوم — قيد المراجعة", counts.reviewToday, "today-review", "status-operation"),
+        todayOperationCard("اليوم — ساري", counts.validToday, "today-valid", "status-operation"),
+        todayOperationCard("اليوم — مغلق", counts.closedToday, "today-closed", "status-operation"),
+        todayOperationCard("اليوم — ملغي", counts.cancelledToday, "today-cancelled", "status-operation")
+    ].join("");
+    const message = $("today-operations-message");
+    if (message) message.textContent = `تم تصنيف عمليات اليوم إلى ${Object.keys(counts).length} مؤشرات مستقلة. اضغط أي مؤشر لعرض صفحته فقط.`;
+}
+async function loadTodayOperations(force = false) {
+    if (!currentOrganizationId) return;
+    const updated = $("today-operations-updated");
+    const message = $("today-operations-message");
+    if (message) message.textContent = "جاري طلب أرقام عمليات اليوم فقط...";
+    const range = localTodayRange();
+    try {
+        const todayCreated = q => q.gte("created_at", range.start).lt("created_at", range.end);
+        const todayUpdated = q => q.gte("updated_at", range.start).lt("updated_at", range.end);
+        const statusToday = status => q => todayUpdated(q).eq("status", status);
+        const incompleteToday = q => todayUpdated(q).or("document_number.is.null,entity_name.is.null,items.eq.[]");
+        let results;
+        try {
+            results = await Promise.all([
+                countOrganizationDocuments(todayCreated),
+                countOrganizationDocuments(todayUpdated),
+                countOrganizationDocuments(incompleteToday),
+                countOrganizationDocuments(statusToday("مفتوح")),
+                countOrganizationDocuments(statusToday("قيد المراجعة")),
+                countOrganizationDocuments(statusToday("ساري")),
+                countOrganizationDocuments(statusToday("مغلق")),
+                countOrganizationDocuments(statusToday("ملغي"))
+            ]);
+        } catch (error) {
+            console.warn("تعذر عد البنود الفارغة ضمن عمليات اليوم، سيتم استخدام الحقول الأساسية", error);
+            results = await Promise.all([
+                countOrganizationDocuments(todayCreated),
+                countOrganizationDocuments(todayUpdated),
+                countOrganizationDocuments(q => todayUpdated(q).or("document_number.is.null,entity_name.is.null")),
+                countOrganizationDocuments(statusToday("مفتوح")),
+                countOrganizationDocuments(statusToday("قيد المراجعة")),
+                countOrganizationDocuments(statusToday("ساري")),
+                countOrganizationDocuments(statusToday("مغلق")),
+                countOrganizationDocuments(statusToday("ملغي"))
+            ]);
+        }
+        const counts = {newToday:results[0], updatedToday:results[1], incompleteToday:results[2], openToday:results[3], reviewToday:results[4], validToday:results[5], closedToday:results[6], cancelledToday:results[7]};
+        renderTodayOperations(counts);
+        if (updated) updated.textContent = `آخر تحديث: ${new Date().toLocaleTimeString("ar-EG", {hour:"2-digit", minute:"2-digit"})}`;
+    } catch (error) {
+        console.error("Today operations error", error);
+        if (message) message.textContent = "تعذر تحديث عمليات اليوم. لم يتم تحميل قائمة المستندات كاملة.";
+        if (updated) updated.textContent = "تعذر التحديث";
     }
 }
 async function updateDocumentStatus(documentId, newStatus) {
@@ -3723,6 +3874,7 @@ async function updateDocumentStatus(documentId, newStatus) {
     followupSummaryCache = null;
     await loadDocuments();
     refreshFollowupSummary(true);
+    loadTodayOperations(true);
 }
 
 /* عرض البطاقات */
@@ -4373,6 +4525,7 @@ if (editingDocumentId) {
     currentPage = 0;
     await loadDocuments();
     await refreshFollowupSummary(true);
+    await loadTodayOperations();
 }
 
 /* مسح النموذج */
@@ -4680,6 +4833,15 @@ $("page-size").addEventListener(
 }
 );
 
+$("sort-documents").addEventListener(
+    "change",
+    () => {
+        activeSort = $("sort-documents").value || "newest";
+        currentPage = 0;
+        loadDocuments();
+    }
+);
+
 /* بدء النظام */
 async function startApplication() {
     const session =
@@ -4710,6 +4872,7 @@ if (organizationId) {
     await loadFilters();
     await loadDocuments();
     await refreshFollowupSummary(true);
+    await loadTodayOperations();
 }
 else {
     document
