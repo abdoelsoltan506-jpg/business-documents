@@ -275,6 +275,20 @@ button {
 .operation-card.new-operation strong { color:var(--green); }
 .operation-card.edit-operation strong { color:var(--blue); }
 .operation-card.status-operation strong { color:var(--orange); }
+.source-guide-editor { margin-top:10px; padding:12px; border:1px solid #d7e6f8; border-radius:10px; background:#f8fbff; }
+.source-guide-editor h4 { margin:0 0 8px; color:var(--navy); font-size:.86rem; }
+.source-guide-heading { display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
+.source-help-button { border:1px solid #b7cde8; border-radius:7px; padding:6px 10px; background:#fff; color:var(--blue); cursor:pointer; font-weight:700; font-size:.74rem; }
+.source-guide-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:9px; }
+.source-guide-button { width:100%; margin-top:10px; padding:10px; border:0; border-radius:8px; background:#fff3d6; color:#875a00; cursor:pointer; font-weight:bold; }
+.source-guide-note { color:var(--muted); font-size:.72rem; margin-top:7px; }
+.source-guide-result { display:grid; gap:10px; }
+.source-guide-row { padding:10px; border:1px solid var(--line); border-radius:9px; background:#f8fbff; }
+.source-guide-row span { display:block; color:var(--muted); font-size:.72rem; margin-bottom:3px; }
+.source-guide-row strong { color:var(--navy); word-break:break-word; }
+.source-guide-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+@media (max-width:760px) { .source-guide-grid { grid-template-columns:1fr 1fr; } }
+
 
 @media (max-width:760px) { .activity-columns { grid-template-columns:1fr; } }
 
@@ -2251,6 +2265,51 @@ dialog#analytics-dialog[open] .analytics-modal {
             <input id="source-url" type="url">
         </div>
 
+        <div class="full-width quick-optional source-guide-editor">
+            <div class="source-guide-heading">
+                <h4>مساعد الوصول إلى المصدر — إضافة اختيارية</h4>
+                <button type="button" class="source-help-button" onclick="openSourceGuideHelp()">تعليمات وأهمية الاستخدام</button>
+            </div>
+            <div class="source-guide-grid">
+                <div>
+                    <label for="source-type">نوع المصدر</label>
+                    <select id="source-type">
+                        <option value="">غير محدد</option>
+                        <option value="Word">Word</option>
+                        <option value="Excel">Excel</option>
+                        <option value="PDF">PDF</option>
+                        <option value="نظام داخلي">نظام داخلي / موقع الشركة</option>
+                        <option value="أخرى">أخرى</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="source-section">القسم أو العنوان</label>
+                    <input id="source-section" placeholder="مثال: التوصيات النهائية">
+                </div>
+                <div>
+                    <label for="source-page">رقم الصفحة</label>
+                    <input id="source-page" inputmode="numeric" placeholder="مثال: 7">
+                </div>
+                <div>
+                    <label for="source-bookmark">اسم Bookmark في Word</label>
+                    <input id="source-bookmark" placeholder="مثال: توصيات_المشروع">
+                </div>
+                <div>
+                    <label for="source-sheet">اسم ورقة Excel</label>
+                    <input id="source-sheet" placeholder="مثال: المبيعات">
+                </div>
+                <div>
+                    <label for="source-cell">خلية أو نطاق Excel</label>
+                    <input id="source-cell" placeholder="مثال: B27 أو B27:F40">
+                </div>
+                <div class="full-width" style="grid-column:span 2;">
+                    <label for="source-access-note">تعليمات إضافية للوصول</label>
+                    <input id="source-access-note" placeholder="مثال: يجب الاتصال بشبكة الشركة أو VPN">
+                </div>
+            </div>
+            <div class="source-guide-note">الرابط القديم يبقى كما هو. هذه الخانات تضيف إرشادًا فقط ولا تمنح صلاحية جديدة ولا ترفع الملف إلى النظام.</div>
+        </div>
+
         <div class="full-width quick-optional">
             <label>ملاحظات وشروط</label>
             <textarea id="notes" placeholder="اكتب كل ملاحظة أو شرط في سطر مستقل...
@@ -2507,6 +2566,74 @@ dialog#analytics-dialog[open] .analytics-modal {
         </div>
 
         <div id="modal-body"></div>
+    </div>
+</dialog>
+
+<!-- نافذة مساعد الوصول إلى المصدر -->
+<dialog id="source-guide-dialog">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>مساعد الوصول إلى المصدر</h2>
+            <button class="close-button" type="button" onclick="closeSourceGuide()">إغلاق</button>
+        </div>
+        <div id="source-guide-body"></div>
+    </div>
+</dialog>
+
+<!-- نافذة تعليمات مساعد الوصول إلى المصدر -->
+<dialog id="source-help-dialog">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>دليل مساعد الوصول إلى المصدر وأهميته</h2>
+            <button class="close-button" type="button" onclick="closeSourceGuideHelp()">إغلاق</button>
+        </div>
+        <div class="source-guide-result">
+            <div class="source-guide-row">
+                <strong>ما قيمة هذه الميزة مستقبلًا؟</strong>
+                <div>هذه الميزة تحول البطاقة من مجرد اسم ورقم إلى «خريطة وصول» للمستند الأصلي. فائدتها تظهر عندما يكبر عدد الملفات، أو يتغير الموظفون، أو يحتاج المدير إلى مراجعة المصدر بسرعة، أو يعود الفريق إلى مستند بعد عدة أشهر.</div>
+                <div>هي لا تنافس Word أو Excel ولا تستبدلهما؛ بل تحفظ مكان المعلومة داخل الملف الأصلي وتقلل وقت البحث والتخمين وتكرار إنشاء نفس المستند.</div>
+            </div>
+            <div class="source-guide-row">
+                <strong>كيف تستخدمها بطريقة صحيحة؟</strong>
+                <div>1. ضع الرابط القديم إن كان متاحًا.</div>
+                <div>2. اختر نوع المصدر.</div>
+                <div>3. اكتب موضع المعلومة: العنوان أو القسم، الصفحة، Bookmark، ورقة Excel، أو الخلية والنطاق.</div>
+                <div>4. أضف شرط الوصول إن كان مطلوبًا، مثل الاتصال بشبكة الشركة أو VPN.</div>
+                <div>5. اكتب الإرشاد بحيث يفهمه موظف آخر لم يشارك في إنشاء المستند.</div>
+            </div>
+            <div class="source-guide-row">
+                <strong>Word — ما هو Bookmark وكيف نستخدمه؟</strong>
+                <div>الـ Bookmark هو اسم يضعه المستخدم داخل مستند Word على موضع محدد، مثل فقرة أو جدول أو توصية مهمة. وهو أدق من قول «اذهب إلى منتصف المستند».</div>
+                <div><b>طريقة إنشائه في Word:</b> حدّد العنوان أو الفقرة أو موضع الجدول، ثم افتح تبويب <b>Insert / إدراج</b>، واختر <b>Bookmark / ارتباط تشعبي مرجعي</b>، اكتب اسمًا واضحًا بلا مسافات مثل <b>توصيات_المشروع</b>، ثم اضغط <b>Add / إضافة</b>.</div>
+                <div><b>ماذا نسجل هنا؟</b> اكتب نفس اسم Bookmark في خانة «اسم Bookmark في Word»، واكتب عنوان القسم ورقم الصفحة كإرشاد احتياطي.</div>
+                <div><b>مهم:</b> وجود Bookmark لا يعني أن كل متصفح سيفتح Word عند هذا الموضع تلقائيًا. افتح الملف أولًا، ثم استخدم نافذة البحث أو أمر Go To داخل Word للعثور على الاسم. وقد تختلف النتيجة حسب مكان الملف وصلاحيات الجهاز.</div>
+            </div>
+            <div class="source-guide-row">
+                <strong>Excel — البديل العملي للـ Bookmark</strong>
+                <div>Excel لا يستخدم Bookmark بنفس مفهوم Word عادة. البديل الواضح هو الجمع بين <b>اسم ورقة العمل</b> و<b>عنوان الخلية أو النطاق</b>، مثل: ورقة «المبيعات»، الخلية <b>B27</b>، أو النطاق <b>B27:F40</b>.</div>
+                <div>إذا كانت الشركة تستخدم <b>Named Range / نطاقًا مسمى</b>، يمكن كتابة اسمه في خانة «تعليمات إضافية»، مثل <b>إجمالي_الربع_الثاني</b>. هذا يساعد المستخدم على استعمال مربع الاسم في Excel للوصول إلى الموضع بسرعة.</div>
+                <div><b>أفضل ممارسة:</b> لا تكتب «الجدول الأزرق» أو «أسفل الصفحة». اكتب اسم الورقة ورقم الخلية أو النطاق، لأن الصفوف والأعمدة قد تتغير مع الوقت.</div>
+            </div>
+            <div class="source-guide-row">
+                <strong>PDF والمصادر الأخرى</strong>
+                <div><b>PDF:</b> اكتب رقم الصفحة والعنوان. سيحاول النظام إضافة رقم الصفحة إلى الرابط، لكن الانتقال يعتمد على برنامج أو متصفح فتح PDF.</div>
+                <div><b>نظام داخلي أو SharePoint أو شبكة الشركة:</b> اكتب اسم النظام والمسار أو اسم المجلد، وأوضح هل يلزم VPN أو حساب شركة. النظام لا يتجاوز هذه الصلاحيات.</div>
+                <div><b>رابط محلي file:///:</b> يعمل عادة على الجهاز الذي يوجد عليه الملف فقط، لذلك ليس رابطًا تجاريًا عامًا بين أجهزة الشركة.</div>
+            </div>
+            <div class="source-guide-row">
+                <strong>مثال جاهز لإرشاد جيد</strong>
+                <div>المصدر: Word — القسم: التوصيات النهائية — الصفحة: 7 — Bookmark: توصيات_المشروع — يلزم فتح الملف من مجلد الشركة أو الاتصال بـ VPN.</div>
+                <div>ومثال Excel: ورقة «المبيعات الشهرية» — النطاق B27:F40 — النطاق المسمى: إجمالي_نوفمبر.</div>
+            </div>
+            <div class="source-guide-row">
+                <strong>ما الذي لا يفعله هذا المساعد؟</strong>
+                <div>لا يرفع الملفات إلى Supabase، ولا ينشئ نسخة احتياطية، ولا يمنح صلاحية جديدة، ولا يتجاوز حماية Word أو Excel أو SharePoint أو شبكة الشركة. الملفات الأصلية تبقى لدى الشركة، والمستخدم يجب أن يملك الصلاحية أصلًا.</div>
+            </div>
+            <div class="source-guide-row">
+                <strong>قاعدة المراجعة المستقبلية</strong>
+                <div>عند نقل الملف أو إعادة تسمية ورقة Excel أو حذف Bookmark، عدّل إرشاد المصدر في البطاقة. راجع الإرشادات المهمة دوريًا حتى لا تصبح قديمة. وإذا لم يوجد موضع محدد، اكتب عنوان المستند والمجلد أو النظام بدل ترك الحقل غامضًا.</div>
+            </div>
+        </div>
     </div>
 </dialog>
 
@@ -4014,6 +4141,10 @@ function renderCards() {
                         </div>
                     `}
 
+                    ${(document.source_url || sourceGuideHasData(getSourceGuideFromNotes(document.notes).guide)) ? `
+                        <button type="button" class="source-guide-button" onclick="openSourceGuide('${document.id}')">مساعد الوصول إلى المصدر</button>
+                    ` : ""}
+
                     <button
                         class="details-button"
                         onclick="openDetails('${document.id}')">
@@ -4079,6 +4210,84 @@ function renderCards() {
             `;
         }).join("");
 }
+function getSourceGuideFromNotes(notes) {
+    const text = String(notes || "");
+    const start = text.indexOf(SOURCE_GUIDE_START);
+    const end = text.indexOf(SOURCE_GUIDE_END, start + SOURCE_GUIDE_START.length);
+    if (start === -1 || end === -1) return { cleanNotes: text, guide: {} };
+    const json = text.slice(start + SOURCE_GUIDE_START.length, end).trim();
+    let guide = {};
+    try { guide = JSON.parse(json) || {}; } catch (error) { console.warn("تعذر قراءة إرشاد المصدر", error); }
+    const cleanNotes = (text.slice(0, start) + text.slice(end + SOURCE_GUIDE_END.length)).replace(/\n{3,}/g, "\n\n").trim();
+    return { cleanNotes, guide };
+}
+function getSourceGuideFromForm() {
+    return {
+        type: $("source-type")?.value.trim() || "",
+        section: $("source-section")?.value.trim() || "",
+        page: $("source-page")?.value.trim() || "",
+        bookmark: $("source-bookmark")?.value.trim() || "",
+        sheet: $("source-sheet")?.value.trim() || "",
+        cell: $("source-cell")?.value.trim() || "",
+        accessNote: $("source-access-note")?.value.trim() || ""
+    };
+}
+function sourceGuideHasData(guide) { return Object.values(guide || {}).some(value => String(value || "").trim()); }
+function buildNotesWithSourceGuide(notes, guide) {
+    const cleanNotes = getSourceGuideFromNotes(notes).cleanNotes.trim();
+    if (!sourceGuideHasData(guide)) return cleanNotes || null;
+    const payload = JSON.stringify(guide);
+    return [cleanNotes, `${SOURCE_GUIDE_START}${payload}${SOURCE_GUIDE_END}`].filter(Boolean).join("\n\n");
+}
+function fillSourceGuideForm(guide = {}) {
+    const values = { "source-type":guide.type || "", "source-section":guide.section || "", "source-page":guide.page || "", "source-bookmark":guide.bookmark || "", "source-sheet":guide.sheet || "", "source-cell":guide.cell || "", "source-access-note":guide.accessNote || "" };
+    Object.entries(values).forEach(([id, value]) => { if ($(id)) $(id).value = value; });
+}
+function sourceGuideInstruction(guide) {
+    const type = guide.type || "مصدر خارجي أو داخلي";
+    const lines = [`نوع المصدر: ${type}`];
+    if (guide.section) lines.push(`القسم أو العنوان: ${guide.section}`);
+    if (guide.page) lines.push(`الصفحة التقريبية: ${guide.page}`);
+    if (guide.bookmark) lines.push(`Bookmark في Word: ${guide.bookmark}`);
+    if (guide.sheet) lines.push(`ورقة Excel: ${guide.sheet}`);
+    if (guide.cell) lines.push(`خلية أو نطاق Excel: ${guide.cell}`);
+    if (guide.accessNote) lines.push(`تعليمات: ${guide.accessNote}`);
+    return lines;
+}
+function sourceLinkWithPage(url, guide) {
+    if (!url) return "";
+    if (String(guide.type).toLowerCase() === "pdf" && guide.page && !String(url).includes("#")) return `${url}#page=${encodeURIComponent(guide.page)}`;
+    return url;
+}
+function openSourceGuide(documentId) {
+    const record = currentDocuments.find(row => String(row.id) === String(documentId));
+    if (!record) return;
+    const parsed = getSourceGuideFromNotes(record.notes);
+    const guide = parsed.guide || {};
+    const body = $("source-guide-body");
+    const link = sourceLinkWithPage(record.source_url || "", guide);
+    const lines = sourceGuideInstruction(guide);
+    body.innerHTML = `<div class="source-guide-result">
+        ${link ? `<div class="source-guide-row"><span>الرابط الأصلي</span><strong>${escapeHtml(record.source_url)}</strong></div>` : `<div class="source-guide-row"><span>الرابط الأصلي</span><strong>لا يوجد رابط محفوظ — سيظهر الإرشاد النصي فقط.</strong></div>`}
+        ${lines.map(line => `<div class="source-guide-row"><strong>${escapeHtml(line)}</strong></div>`).join("")}
+        <div class="source-guide-row"><span>تنبيه الصلاحيات</span><strong>الرابط لا يمنح صلاحية جديدة. يجب أن يكون المستخدم مخولًا للوصول إلى ملف الشركة أو شبكتها.</strong></div>
+        <div class="source-guide-actions">
+            ${link ? `<a class="primary-button" href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer">فتح الرابط الأصلي</a>` : ""}
+            <button type="button" class="secondary-button" onclick="copySourceGuide('${record.id}')">نسخ إرشاد الوصول</button>
+        </div>
+    </div>`;
+    window.currentSourceGuideText = [record.source_url ? `الرابط: ${record.source_url}` : "", ...lines, "الرابط لا يمنح صلاحية جديدة، وتبقى صلاحيات الملف لدى الشركة."].filter(Boolean).join("\n");
+    $("source-guide-dialog").showModal();
+}
+function closeSourceGuide() { const dialog = $("source-guide-dialog"); if (dialog?.open) dialog.close(); }
+function openSourceGuideHelp() { const dialog = $("source-help-dialog"); if (dialog && !dialog.open) dialog.showModal(); }
+function closeSourceGuideHelp() { const dialog = $("source-help-dialog"); if (dialog?.open) dialog.close(); }
+async function copySourceGuide(documentId) {
+    const text = window.currentSourceGuideText || "";
+    try { await navigator.clipboard.writeText(text); alert("تم نسخ إرشاد الوصول"); }
+    catch (error) { window.prompt("انسخ إرشاد الوصول", text); }
+}
+
 function startEditDocument(documentId) {
     const record =
         currentDocuments.find(
@@ -4116,8 +4325,9 @@ function startEditDocument(documentId) {
     $("source-url").value =
         record.source_url || "";
 
-    $("notes").value =
-        record.notes || "";
+    const parsedSource = getSourceGuideFromNotes(record.notes);
+    $("notes").value = parsedSource.cleanNotes || "";
+    fillSourceGuideForm(parsedSource.guide);
 
         $("header-right").value = record.header_right || "";
     $("header-center").value = record.header_center || record.header_text || "";
@@ -4448,7 +4658,7 @@ if (!currentOrganizationId) {
             $("source-url").value.trim() || null,
 
         notes:
-            $("notes").value.trim() || null,
+            buildNotesWithSourceGuide($("notes").value, getSourceGuideFromForm()),
 
                 header_text: null,
         header_align: "center",
@@ -4530,7 +4740,8 @@ if (editingDocumentId) {
 
 /* مسح النموذج */
 function clearForm() {
-    ["document-number", "entity-name", "period-from", "period-to", "source-url", "notes", "header-right", "header-center", "header-left", "intro-text", "conclusion-text", "footer-right", "footer-center", "footer-left"].forEach(id => { const field = $(id); if (field) field.value = ""; });
+    ["document-number", "entity-name", "period-from", "period-to", "source-url", "notes", "source-section", "source-page", "source-bookmark", "source-sheet", "source-cell", "source-access-note", "header-right", "header-center", "header-left", "intro-text", "conclusion-text", "footer-right", "footer-center", "footer-left"].forEach(id => { const field = $(id); if (field) field.value = ""; });
+    if ($("source-type")) $("source-type").value = "";
     ["header-right-style", "header-left-style", "footer-right-style", "footer-center-style", "footer-left-style"].forEach(id => { const field = $(id); if (field) field.value = "normal"; });
     if ($("header-center-style")) $("header-center-style").value = "bold";
     $("amount").value = "";
@@ -4571,6 +4782,8 @@ function normalizeTextStyle(value) {
 }
 
 let currentDetailsRecord = null;
+const SOURCE_GUIDE_START = "[[SOURCE_GUIDE_V1]]";
+const SOURCE_GUIDE_END = "[[/SOURCE_GUIDE_V1]]";
 
 
 function openDetails(id) {
@@ -4612,6 +4825,9 @@ function openDetails(id) {
         : Number(record.amount || 0);
 
     const amountWords = arabicAmountWords(finalTotal);
+    const parsedSource = getSourceGuideFromNotes(record.notes);
+    const sourceGuide = parsedSource.guide || {};
+    const cleanRecordNotes = parsedSource.cleanNotes;
     const headerRight = record.header_right || "";
     const headerCenter = record.header_center || record.header_text || "";
     const headerLeft = record.header_left || "";
@@ -4754,9 +4970,17 @@ function openDetails(id) {
                             : "—"}
                     </div>
                 </div>
+                ${(record.source_url || sourceGuideHasData(sourceGuide)) ? `
+                    <div class="details-notes-box" style="margin-top:12px;">
+                        <span class="details-notes-label">إرشاد الوصول إلى المصدر</span>
+                        <div class="source-guide-result">
+                            ${sourceGuideInstruction(sourceGuide).map(line => `<div class="source-guide-row"><strong>${escapeHtml(line)}</strong></div>`).join("")}
+                            <button type="button" class="source-guide-button" onclick="openSourceGuide('${record.id}')">فتح مساعد الوصول إلى المصدر</button>
+                        </div>
+                    </div>` : ""}
                 <div class="details-notes-box">
                     <span class="details-notes-label">ملاحظات وشروط</span>
-                    ${escapeHtml(record.notes || "لا توجد ملاحظات أو شروط")}
+                    ${escapeHtml(cleanRecordNotes || "لا توجد ملاحظات أو شروط")}
                 </div>
             </section>
 
