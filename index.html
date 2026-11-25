@@ -1229,6 +1229,15 @@ dialog#details-dialog {
     line-height:1.9;
     white-space:pre-line;
     overflow-wrap:anywhere;
+    text-align:right;
+    direction:rtl;
+}
+.print-intro-title {
+    display:block;
+    margin:0 0 8px;
+    text-align:right;
+    direction:rtl;
+    line-height:1.6;
 }
 
 
@@ -2159,20 +2168,20 @@ dialog#analytics-dialog[open] .analytics-modal {
         id="create-company-button"
         class="secondary-button"
         type="button">
-        إنشاء شركة
+        Create Company
     </button>
 <button
     id="manage-employees-button"
     class="secondary-button"
     type="button">
-    إدارة الموظفين
+    Employee Management
 </button>
 
     <button
         id="logout-button"
         class="secondary-button hidden"
         onclick="logoutUser()">
-        خروج
+        Logout
     </button>
 </div>
 
@@ -2329,6 +2338,27 @@ dialog#analytics-dialog[open] .analytics-modal {
         </div>
         <div class="full-width quick-optional">
             <label>مقدمة أو شرح المستند (اختياري)</label>
+            <label for="intro-title">عنوان رئيسي للمقدمة (اختياري)</label>
+            <input id="intro-title" type="text" placeholder="مثال: مقدمة العرض">
+            <div class="print-parts-grid" style="margin-top:8px;">
+                <div>
+                    <label for="intro-title-style">تنسيق العنوان</label>
+                    <select id="intro-title-style">
+                        <option value="normal">عادي</option>
+                        <option value="bold">عريض</option>
+                        <option value="underline">تحته خط</option>
+                        <option value="bold-underline">عريض وتحته خط</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="intro-title-size">حجم العنوان</label>
+                    <select id="intro-title-size">
+                        <option value="normal">عادي</option>
+                        <option value="large">كبير</option>
+                    </select>
+                </div>
+            </div>
+            <label for="intro-text">نص المقدمة</label>
             <textarea id="intro-text" placeholder="مثال: يسعدنا أن نقدم لكم عرض السعر التالي..."></textarea>
         </div>
         <div class="full-width quick-optional">
@@ -2627,7 +2657,7 @@ dialog#analytics-dialog[open] .analytics-modal {
             </div>
             <div class="source-guide-row">
                 <strong>ما الذي لا يفعله هذا المساعد؟</strong>
-                <div>لا يرفع الملفات إلى Supabase، ولا ينشئ نسخة احتياطية، ولا يمنح صلاحية جديدة، ولا يتجاوز حماية Word أو Excel أو SharePoint أو شبكة الشركة. الملفات الأصلية تبقى لدى الشركة، والمستخدم يجب أن يملك الصلاحية أصلًا.</div>
+                <div>لا يرفع الملفات إلى قاعدة البيانات، ولا ينشئ نسخة احتياطية، ولا يمنح صلاحية جديدة، ولا يتجاوز حماية Word أو Excel أو SharePoint أو شبكة الشركة. الملفات الأصلية تبقى لدى الشركة، والمستخدم يجب أن يملك الصلاحية أصلًا.</div>
             </div>
             <div class="source-guide-row">
                 <strong>قاعدة المراجعة المستقبلية</strong>
@@ -4335,7 +4365,11 @@ function startEditDocument(documentId) {
     $("header-right-style").value = record.header_right_style || "normal";
     $("header-center-style").value = record.header_center_style || "bold";
     $("header-left-style").value = record.header_left_style || "normal";
-    $("intro-text").value = record.intro_text || "";
+    const introData = parseIntroText(record.intro_text);
+    $("intro-title").value = introData.title;
+    $("intro-title-style").value = introData.titleStyle;
+    $("intro-title-size").value = introData.titleSize;
+    $("intro-text").value = introData.text;
     $("conclusion-text").value = record.conclusion_text || "";
     $("footer-right").value = record.footer_right || "";
     $("footer-center").value = record.footer_center || record.footer_text || "";
@@ -4668,7 +4702,12 @@ if (!currentOrganizationId) {
         header_right_style: $("header-right-style").value || "normal",
         header_center_style: $("header-center-style").value || "bold",
         header_left_style: $("header-left-style").value || "normal",
-        intro_text: $("intro-text").value.trim() || null,
+        intro_text: serializeIntroText({
+            title: $("intro-title").value.trim(),
+            titleStyle: $("intro-title-style").value,
+            titleSize: $("intro-title-size").value,
+            text: $("intro-text").value.trim()
+        }),
         conclusion_text: $("conclusion-text").value.trim() || null,
         footer_text: null,
         footer_align: "center",
@@ -4740,10 +4779,12 @@ if (editingDocumentId) {
 
 /* مسح النموذج */
 function clearForm() {
-    ["document-number", "entity-name", "period-from", "period-to", "source-url", "notes", "source-section", "source-page", "source-bookmark", "source-sheet", "source-cell", "source-access-note", "header-right", "header-center", "header-left", "intro-text", "conclusion-text", "footer-right", "footer-center", "footer-left"].forEach(id => { const field = $(id); if (field) field.value = ""; });
+    ["document-number", "entity-name", "period-from", "period-to", "source-url", "notes", "source-section", "source-page", "source-bookmark", "source-sheet", "source-cell", "source-access-note", "header-right", "header-center", "header-left", "intro-title", "intro-text", "conclusion-text", "footer-right", "footer-center", "footer-left"].forEach(id => { const field = $(id); if (field) field.value = ""; });
     if ($("source-type")) $("source-type").value = "";
     ["header-right-style", "header-left-style", "footer-right-style", "footer-center-style", "footer-left-style"].forEach(id => { const field = $(id); if (field) field.value = "normal"; });
     if ($("header-center-style")) $("header-center-style").value = "bold";
+    if ($("intro-title-style")) $("intro-title-style").value = "normal";
+    if ($("intro-title-size")) $("intro-title-size").value = "normal";
     $("amount").value = "";
     $("document-date").value = todayDate();
     setItemsEditor();
@@ -4779,6 +4820,35 @@ function normalizeTextStyle(value) {
     if (value === "underline") return "text-decoration:underline;";
     if (value === "bold-underline") return "font-weight:700;text-decoration:underline;";
     return "";
+}
+const INTRO_TEXT_PREFIX = "[[INTRO_FORMAT_V1]]";
+function parseIntroText(value) {
+    const raw = String(value || "");
+    if (raw.startsWith(INTRO_TEXT_PREFIX)) {
+        try {
+            const data = JSON.parse(raw.slice(INTRO_TEXT_PREFIX.length));
+            return {
+                title: typeof data.title === "string" ? data.title : "",
+                titleStyle: ["normal", "bold", "underline", "bold-underline"].includes(data.titleStyle) ? data.titleStyle : "normal",
+                titleSize: data.titleSize === "large" ? "large" : "normal",
+                text: typeof data.text === "string" ? data.text : ""
+            };
+        } catch (error) {
+            console.warn("تعذر قراءة تنسيق المقدمة؛ سيُعرض النص كما هو.", error);
+        }
+    }
+    return { title: "", titleStyle: "normal", titleSize: "normal", text: raw };
+}
+function serializeIntroText(data) {
+    const title = String(data.title || "").trim();
+    const text = String(data.text || "").trim();
+    if (!title && !text) return null;
+    return INTRO_TEXT_PREFIX + JSON.stringify({
+        title,
+        titleStyle: ["normal", "bold", "underline", "bold-underline"].includes(data.titleStyle) ? data.titleStyle : "normal",
+        titleSize: data.titleSize === "large" ? "large" : "normal",
+        text
+    });
 }
 
 let currentDetailsRecord = null;
@@ -4896,7 +4966,7 @@ function openDetails(id) {
                 </div>
             </section>
 
-            ${record.intro_text ? `<div class="print-intro" style="text-align:${normalizeTextAlign(record.header_align)}">${escapeHtml(record.intro_text)}</div>` : ""}
+            ${record.intro_text ? (() => { const intro = parseIntroText(record.intro_text); return `<div class="print-intro">${intro.title ? `<strong class="print-intro-title" style="${normalizeTextStyle(intro.titleStyle)}${intro.titleSize === "large" ? "font-size:1.25em;" : ""}">${escapeHtml(intro.title)}</strong>` : ""}${intro.text ? `<div>${escapeHtml(intro.text)}</div>` : ""}</div>`; })() : ""}
 
             <section class="details-section">
                 <h3 class="details-section-title">تفاصيل البنود المالية</h3>
@@ -5338,33 +5408,7 @@ async function loadOrganizationMembers() {
         }
     </b>
 
-    ${
-        member.member_role === "member"
-            ? `
-                <label
-                    style="
-                        display:block;
-                        margin-top:6px;
-                        font-size:.72rem;
-                        color:#6b7280;
-                        cursor:pointer;
-                    "
-                >
-                    <input
-                        type="checkbox"
-                        class="member-delete-permission"
-                        data-member-id="${member.member_user_id}"
-                        ${
-                            member.member_can_delete
-                                ? "checked"
-                                : ""
-                        }
-                    >
-                    السماح بالحذف
-                </label>
-              `
-            : ""
-    }
+    
 </div>
 
 
