@@ -205,15 +205,32 @@ button {
     white-space: nowrap;
 }
 
-.status-review {
-    background: #fff4dd;
-    color: var(--orange);
-}
-
-.status-closed {
-    background: #fbe9e7;
-    color: var(--red);
-}
+/* ألوان واضحة وثابتة: لون واحد لكل حالة */
+.status-open { background:#2563eb; color:#fff; }
+.status-review { background:#c77700; color:#fff; }
+.status-valid { background:#218347; color:#fff; }
+.status-closed { background:#667085; color:#fff; }
+.status-cancelled { background:#c62828; color:#fff; }
+.card.card-open { border-right:7px solid #2563eb; background:#eaf2ff; }
+.card.card-review { border-right:7px solid #c77700; background:#fff4db; }
+.card.card-valid { border-right:7px solid #218347; background:#e8f5e9; }
+.card.card-closed { border-right:7px solid #667085; background:#edf0f4; }
+.card.card-cancelled { border-right:7px solid #c62828; background:#fdebec; }
+.status-summary-wrap { margin:0 0 14px; }
+.status-summary-note { margin:0 0 8px; color:#586579; font-size:13px; }
+.status-summary { display:flex; flex-wrap:wrap; gap:9px; }
+.status-chip { display:inline-flex; align-items:center; gap:8px; min-height:40px; padding:7px 12px; border:1px solid #d7dee8; border-radius:9px; background:#fff; color:#253247; font:inherit; cursor:pointer; transition:transform .12s ease, box-shadow .12s ease; }
+.status-chip:hover { transform:translateY(-1px); box-shadow:0 3px 10px rgba(20,35,55,.12); }
+.status-chip:focus-visible { outline:3px solid #2563eb; outline-offset:2px; }
+.status-chip.active { box-shadow:0 0 0 2px #243b5a; }
+.status-chip-dot { width:12px; height:12px; border-radius:3px; flex:none; }
+.status-chip-count { min-width:1.3em; padding:1px 6px; border-radius:6px; background:#f1f4f8; color:#1f2937; font-weight:700; text-align:center; }
+.status-chip[data-status="مفتوح"] .status-chip-dot { background:#2563eb; }
+.status-chip[data-status="قيد المراجعة"] .status-chip-dot { background:#c77700; }
+.status-chip[data-status="ساري"] .status-chip-dot { background:#218347; }
+.status-chip[data-status="مغلق"] .status-chip-dot { background:#667085; }
+.status-chip[data-status="ملغي"] .status-chip-dot { background:#c62828; }
+@media (max-width:600px) { .status-chip { flex:1 1 42%; justify-content:center; } }
 
 .card-data {
     border-top: 1px solid var(--line);
@@ -1745,8 +1762,6 @@ dialog#analytics-dialog[open] .analytics-modal {
 
 <p id="login-message" class="message"></p>
 
-
-        <p id="login-message" class="message"></p>
     </div>
 </div>
 <div
@@ -2244,7 +2259,7 @@ dialog#analytics-dialog[open] .analytics-modal {
 
         <div class="quick-optional">
             <label>القيمة</label>
-            <input id="amount" type="number" step="0.01">
+            <input id="amount" type="text" inputmode="decimal" dir="ltr" autocomplete="off" aria-label="القيمة بالأرقام العربية">
         </div>
 
         <div class="quick-optional">
@@ -2255,6 +2270,50 @@ dialog#analytics-dialog[open] .analytics-modal {
         <div class="quick-optional">
             <label>إلى / نهاية الفترة</label>
             <input id="period-to">
+        </div>
+
+        <div class="full-width print-settings-section quick-optional">
+            <h3 class="print-fields-title">الهيدر — ثلاثة أجزاء مستقلة</h3>
+            <div class="print-parts-grid">
+                <div><label for="header-right">الهيدر الأيمن</label><textarea id="header-right" placeholder="اسم الشركة أو الشعار أو العنوان"></textarea><select id="header-right-style"><option value="normal">عادي</option><option value="bold">عريض</option><option value="underline">تحته خط</option><option value="bold-underline">عريض وتحته خط</option></select></div>
+                <div><label for="header-center">الهيدر الأوسط</label><textarea id="header-center" placeholder="عنوان المستند أو بيانات وسط الصفحة"></textarea><select id="header-center-style"><option value="normal">عادي</option><option value="bold" selected>عريض</option><option value="underline">تحته خط</option><option value="bold-underline">عريض وتحته خط</option></select></div>
+                <div><label for="header-left">الهيدر الأيسر</label><textarea id="header-left" placeholder="الهاتف أو البريد أو الفرع"></textarea><select id="header-left-style"><option value="normal">عادي</option><option value="bold">عريض</option><option value="underline">تحته خط</option><option value="bold-underline">عريض وتحته خط</option></select></div>
+            </div>
+            <small class="compatibility-note">المستندات القديمة التي تحتوي على الهيدر السابق ستظهر تلقائيًا في الجزء الأوسط.</small>
+        </div>
+
+        <div class="full-width quick-optional">
+            <label>مقدمة أو شرح المستند (اختياري)</label>
+            <label for="intro-title">عنوان رئيسي للمقدمة (اختياري)</label>
+            <input id="intro-title" type="text" placeholder="مثال: مقدمة العرض">
+            <div class="print-parts-grid" style="margin-top:8px;">
+                <div>
+                    <label for="intro-title-style">تنسيق العنوان</label>
+                    <select id="intro-title-style">
+                        <option value="normal">عادي</option>
+                        <option value="bold">عريض</option>
+                        <option value="underline">تحته خط</option>
+                        <option value="bold-underline">عريض وتحته خط</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="intro-title-size">حجم العنوان</label>
+                    <select id="intro-title-size">
+                        <option value="normal">عادي</option>
+                        <option value="large">كبير</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="intro-title-align">محاذاة العنوان</label>
+                    <select id="intro-title-align">
+                        <option value="right">يمين</option>
+                        <option value="center">وسط</option>
+                        <option value="left">يسار</option>
+                    </select>
+                </div>
+            </div>
+            <label for="intro-text">نص المقدمة</label>
+            <textarea id="intro-text" placeholder="مثال: يسعدنا أن نقدم لكم عرض السعر التالي..."></textarea>
         </div>
 
         <div class="full-width items-section quick-optional">
@@ -2327,44 +2386,37 @@ dialog#analytics-dialog[open] .analytics-modal {
 2. السعر شامل الضريبة"></textarea>
         </div>
 
-        <div class="full-width print-settings-section quick-optional">
-            <h3 class="print-fields-title">الهيدر — ثلاثة أجزاء مستقلة</h3>
-            <div class="print-parts-grid">
-                <div><label for="header-right">الهيدر الأيمن</label><textarea id="header-right" placeholder="اسم الشركة أو الشعار أو العنوان"></textarea><select id="header-right-style"><option value="normal">عادي</option><option value="bold">عريض</option><option value="underline">تحته خط</option><option value="bold-underline">عريض وتحته خط</option></select></div>
-                <div><label for="header-center">الهيدر الأوسط</label><textarea id="header-center" placeholder="عنوان المستند أو بيانات وسط الصفحة"></textarea><select id="header-center-style"><option value="normal">عادي</option><option value="bold" selected>عريض</option><option value="underline">تحته خط</option><option value="bold-underline">عريض وتحته خط</option></select></div>
-                <div><label for="header-left">الهيدر الأيسر</label><textarea id="header-left" placeholder="الهاتف أو البريد أو الفرع"></textarea><select id="header-left-style"><option value="normal">عادي</option><option value="bold">عريض</option><option value="underline">تحته خط</option><option value="bold-underline">عريض وتحته خط</option></select></div>
-            </div>
-            <small class="compatibility-note">المستندات القديمة التي تحتوي على الهيدر السابق ستظهر تلقائيًا في الجزء الأوسط.</small>
-        </div>
         <div class="full-width quick-optional">
-            <label>مقدمة أو شرح المستند (اختياري)</label>
-            <label for="intro-title">عنوان رئيسي للمقدمة (اختياري)</label>
-            <input id="intro-title" type="text" placeholder="مثال: مقدمة العرض">
+            <label for="conclusion-text">الخاتمة</label>
             <div class="print-parts-grid" style="margin-top:8px;">
                 <div>
-                    <label for="intro-title-style">تنسيق العنوان</label>
-                    <select id="intro-title-style">
+                    <label for="conclusion-align">محاذاة الخاتمة</label>
+                    <select id="conclusion-align">
+                        <option value="right">يمين</option>
+                        <option value="center">وسط</option>
+                        <option value="left">يسار</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="conclusion-style">تنسيق الخط</label>
+                    <select id="conclusion-style">
                         <option value="normal">عادي</option>
-                        <option value="bold">عريض</option>
+                        <option value="bold" selected>عريض</option>
                         <option value="underline">تحته خط</option>
                         <option value="bold-underline">عريض وتحته خط</option>
                     </select>
                 </div>
                 <div>
-                    <label for="intro-title-size">حجم العنوان</label>
-                    <select id="intro-title-size">
+                    <label for="conclusion-size">حجم الخط</label>
+                    <select id="conclusion-size">
                         <option value="normal">عادي</option>
                         <option value="large">كبير</option>
                     </select>
                 </div>
             </div>
-            <label for="intro-text">نص المقدمة</label>
-            <textarea id="intro-text" placeholder="مثال: يسعدنا أن نقدم لكم عرض السعر التالي..."></textarea>
-        </div>
-        <div class="full-width quick-optional">
-            <label>الخاتمة</label>
             <textarea id="conclusion-text" placeholder="وتقبلوا فائق الاحترام والتقدير"></textarea>
         </div>
+
         <div class="full-width print-settings-section quick-optional">
             <h3 class="print-fields-title">الفوتر — ثلاثة أجزاء مستقلة</h3>
             <div class="print-parts-grid">
@@ -2533,6 +2585,10 @@ dialog#analytics-dialog[open] .analytics-modal {
     <span id="document-count"></span>
 </div>
 
+<div class="status-summary-wrap">
+    <p class="status-summary-note">ألوان الحالات وإجمالي عدد مستندات كل حالة في قاعدة البيانات لهذه الشركة — اضغط على الحالة لعرض جميع مستنداتها.</p>
+    <div id="document-status-summary" class="status-summary" role="group" aria-label="تصفية المستندات حسب الحالة"></div>
+</div>
 <section id="cards" class="cards">
     <div class="empty">جاري التحميل...</div>
 </section>
@@ -2900,90 +2956,6 @@ async function sendPasswordRecovery() {
     message.textContent =
         "تم إرسال رابط استعادة كلمة المرور إلى بريدك.";
 }
-function openPasswordUpdateWindow() {
-    const windowElement =
-        document.getElementById(
-            "password-update-window"
-        );
-
-    if (windowElement) {
-        windowElement.classList.remove("hidden");
-
-        document
-            .getElementById("new-password")
-            .focus();
-    }
-}
-
-async function updateUserPassword() {
-    const password =
-        document
-            .getElementById("new-password")
-            .value;
-
-    const confirmation =
-        document
-            .getElementById("new-password-confirm")
-            .value;
-
-    const message =
-        document.getElementById(
-            "password-update-message"
-        );
-
-    if (!password || !confirmation) {
-        message.style.color = "#b42318";
-        message.textContent =
-            "اكتب كلمة المرور وأكدها";
-        return;
-    }
-
-    if (password.length < 6) {
-        message.style.color = "#b42318";
-        message.textContent =
-            "كلمة المرور يجب أن تكون 6 أحرف أو أكثر";
-        return;
-    }
-
-    if (password !== confirmation) {
-        message.style.color = "#b42318";
-        message.textContent =
-            "كلمتا المرور غير متطابقتين";
-        return;
-    }
-
-    message.style.color = "#a76500";
-    message.textContent =
-        "جاري حفظ كلمة المرور...";
-
-    const result =
-        await db.auth.updateUser({
-            password: password
-        });
-
-    if (result.error) {
-        console.error(result.error);
-
-        message.style.color = "#b42318";
-        message.textContent =
-            "فشل تغيير كلمة المرور: " +
-            result.error.message;
-
-        return;
-    }
-
-    message.style.color = "#16845b";
-    message.textContent =
-        "تم تغيير كلمة المرور بنجاح. يمكنك الدخول بها الآن.";
-
-    document
-        .getElementById("new-password")
-        .value = "";
-
-    document
-        .getElementById("new-password-confirm")
-        .value = "";
-}
 db.auth.onAuthStateChange(
     function (event) {
         if (event === "PASSWORD_RECOVERY") {
@@ -3080,109 +3052,65 @@ async function updateUserPassword() {
         .getElementById("new-password-confirm")
         .value = "";
 }
-function openPasswordUpdateWindow() {
-    const updateWindow =
-        document.getElementById(
-            "password-update-window"
-        );
 
-    if (!updateWindow) {
-        return;
+function toWesternNumberText(value) {
+    const arabicDigits = "٠١٢٣٤٥٦٧٨٩";
+    const persianDigits = "۰۱۲۳۴۵۶۷۸۹";
+    let text = String(value ?? "").trim();
+    text = text.replace(/[٠-٩]/g, digit => String(arabicDigits.indexOf(digit)));
+    text = text.replace(/[۰-۹]/g, digit => String(persianDigits.indexOf(digit)));
+    text = text.replace(/[٫.]/g, ".").replace(/[٬\s]/g, "");
+    const commas = (text.match(/,/g) || []).length;
+    if (commas) {
+        if (!text.includes(".") && commas === 1) text = text.replace(",", ".");
+        else text = text.replace(/,/g, "");
     }
-
-    updateWindow.classList.remove("hidden");
-
-    const passwordInput =
-        document.getElementById("new-password");
-
-    if (passwordInput) {
-        passwordInput.focus();
-    }
+    return text;
 }
-
-async function updateUserPassword() {
-    const password =
-        document
-            .getElementById("new-password")
-            .value;
-
-    const confirmation =
-        document
-            .getElementById("new-password-confirm")
-            .value;
-
-    const message =
-        document.getElementById(
-            "password-update-message"
-        );
-
-    if (!password || !confirmation) {
-        message.style.color = "#b42318";
-        message.textContent =
-            "اكتب كلمة المرور وأكدها";
-        return;
-    }
-
-    if (password.length < 6) {
-        message.style.color = "#b42318";
-        message.textContent =
-            "كلمة المرور يجب أن تكون 6 أحرف أو أكثر";
-        return;
-    }
-
-    if (password !== confirmation) {
-        message.style.color = "#b42318";
-        message.textContent =
-            "كلمتا المرور غير متطابقتين";
-        return;
-    }
-
-    message.style.color = "#a76500";
-    message.textContent =
-        "جاري حفظ كلمة المرور...";
-
-    const result =
-        await db.auth.updateUser({
-            password: password
-        });
-
-    if (result.error) {
-        console.error(result.error);
-
-        message.style.color = "#b42318";
-        message.textContent =
-            "فشل تغيير كلمة المرور: " +
-            result.error.message;
-
-        return;
-    }
-
-    message.style.color = "#16845b";
-    message.textContent =
-        "تم تغيير كلمة المرور بنجاح.";
-
-    document
-        .getElementById("new-password")
-        .value = "";
-
-    document
-        .getElementById("new-password-confirm")
-        .value = "";
+function parseLocalizedNumber(value) {
+    const text = toWesternNumberText(value);
+    if (!text) return 0;
+    if (!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(text)) return NaN;
+    const number = Number(text);
+    return Number.isFinite(number) ? number : NaN;
 }
-
+function arabicDigitInput(value) {
+    return String(value ?? "").replace(/[0-9]/g, digit => "٠١٢٣٤٥٦٧٨٩"[Number(digit)]).replace(/\./g, "٫");
+}
+function formatArabicNumber(value, minimumFractionDigits = 0, maximumFractionDigits = 2) {
+    const number = Number(value);
+    if (!Number.isFinite(number)) return "٠";
+    return number.toLocaleString("ar-EG", {
+        minimumFractionDigits,
+        maximumFractionDigits
+    });
+}
+function bindArabicNumberInput(input) {
+    input.value = arabicDigitInput(input.value);
+    input.addEventListener("input", function () {
+        const start = input.selectionStart;
+        const end = input.selectionEnd;
+        const localized = arabicDigitInput(input.value);
+        if (localized !== input.value) {
+            input.value = localized;
+            if (start !== null && end !== null) input.setSelectionRange(start, end);
+        }
+        calculateItemsTotal();
+    });
+}
 function calculateItemsTotal() {
     let total = 0;
     document.querySelectorAll(".item-editor-row").forEach(row => {
-        const quantity = Number(row.querySelector(".item-quantity-input").value || 0);
-        const price = Number(row.querySelector(".item-price-input").value || 0);
-        const lineTotal = quantity * price;
-        row.querySelector(".item-line-total").textContent = lineTotal.toLocaleString("ar-EG", {minimumFractionDigits: 2});
+        const quantity = parseLocalizedNumber(row.querySelector(".item-quantity-input").value);
+        const price = parseLocalizedNumber(row.querySelector(".item-price-input").value);
+        const lineTotal = (Number.isFinite(quantity) ? quantity : 0) * (Number.isFinite(price) ? price : 0);
+        row.querySelector(".item-line-total").textContent = formatArabicNumber(lineTotal, 2, 2);
         total += lineTotal;
     });
     const amount = $("amount");
-    if (amount) amount.value = total.toFixed(2);
+    if (amount) amount.value = arabicDigitInput(total.toFixed(2));
     const preview = $("items-total-preview");
-    if (preview) preview.textContent = total.toLocaleString("ar-EG", {minimumFractionDigits: 2});
+    if (preview) preview.textContent = formatArabicNumber(total, 2, 2);
     return total;
 }
 function createItemRow(item = {}) {
@@ -3203,10 +3131,12 @@ function createItemRow(item = {}) {
         <div>
             <label>الكمية</label>
             <input
-                type="number"
-                min="0"
-                step="any"
-                class="item-quantity-input"
+                type="text"
+                inputmode="decimal"
+                dir="ltr"
+                autocomplete="off"
+                aria-label="الكمية بالأرقام العربية"
+                class="item-quantity-input arabic-number-input"
                 value="${item.quantity ?? 1}"
             >
         </div>
@@ -3214,10 +3144,12 @@ function createItemRow(item = {}) {
         <div>
             <label>سعر الوحدة</label>
             <input
-                type="number"
-                min="0"
-                step="0.01"
-                class="item-price-input"
+                type="text"
+                inputmode="decimal"
+                dir="ltr"
+                autocomplete="off"
+                aria-label="سعر الوحدة بالأرقام العربية"
+                class="item-price-input arabic-number-input"
                 value="${item.price ?? 0}"
             >
         </div>
@@ -3244,19 +3176,8 @@ function createItemRow(item = {}) {
     row.querySelector(".item-name-input").value =
         item.name || "";
 
-    row.querySelector(
-        ".item-quantity-input"
-    ).addEventListener(
-        "input",
-        calculateItemsTotal
-    );
-
-    row.querySelector(
-        ".item-price-input"
-    ).addEventListener(
-        "input",
-        calculateItemsTotal
-    );
+    bindArabicNumberInput(row.querySelector(".item-quantity-input"));
+    bindArabicNumberInput(row.querySelector(".item-price-input"));
 
     row.querySelector(
         ".remove-item-button"
@@ -3295,8 +3216,11 @@ function getItemsFromEditor() {
     const items = [];
     document.querySelectorAll(".item-editor-row").forEach(row => {
         const name = row.querySelector(".item-name-input").value.trim();
-        const quantity = Number(row.querySelector(".item-quantity-input").value || 0);
-        const price = Number(row.querySelector(".item-price-input").value || 0);
+        const quantity = parseLocalizedNumber(row.querySelector(".item-quantity-input").value);
+        const price = parseLocalizedNumber(row.querySelector(".item-price-input").value);
+        if (!Number.isFinite(quantity) || !Number.isFinite(price)) {
+            throw new Error("اكتب الكمية وسعر الوحدة بأرقام صحيحة، مثل ١٢ أو ١٢٫٥٠");
+        }
         if (quickEntryMode && !name) return;
         if (!name && quantity === 0 && price === 0) return;
         if (!name) throw new Error("اكتب بيان كل بند أو احذف السطر الفارغ");
@@ -3646,6 +3570,7 @@ async function loadDocuments() {
         result.count || 0;
 
     renderCards();
+    refreshDocumentStatusCounts();
 
     const totalPages =
         Math.ceil(totalDocuments / pageSize);
@@ -4034,8 +3959,73 @@ async function updateDocumentStatus(documentId, newStatus) {
     loadTodayOperations(true);
 }
 
+/* مؤشرات الحالة: الأعداد تُجلب مباشرة من قاعدة البيانات، كاملة لكل شركة */
+const DOCUMENT_STATUS_OPTIONS = ["مفتوح", "قيد المراجعة", "ساري", "مغلق", "ملغي"];
+const documentStatusCounts = Object.fromEntries(DOCUMENT_STATUS_OPTIONS.map(status => [status, null]));
+let documentStatusCountsRequest = 0;
+function renderStatusIndicators() {
+    const container = $("document-status-summary");
+    if (!container) return;
+    const selectedStatus = $("filter-status")?.value || "";
+    container.innerHTML = DOCUMENT_STATUS_OPTIONS.map(status => {
+        const count = documentStatusCounts[status];
+        const label = count === null ? "…" : Number(count).toLocaleString("ar-EG");
+        return `
+        <button type="button" class="status-chip ${selectedStatus === status ? "active" : ""}"
+            data-status="${escapeHtml(status)}" aria-pressed="${selectedStatus === status ? "true" : "false"}"
+            title="تصفية كامل مستندات الشركة حسب حالة ${escapeHtml(status)}">
+            <span class="status-chip-dot" aria-hidden="true"></span>
+            <span>${escapeHtml(status)}</span>
+            <span class="status-chip-count">${label}</span>
+        </button>`;
+    }).join("");
+    container.querySelectorAll(".status-chip").forEach(button => {
+        button.addEventListener("click", () => applyStatusChipFilter(button.dataset.status));
+    });
+}
+async function refreshDocumentStatusCounts() {
+    if (!currentOrganizationId) return;
+    const requestId = ++documentStatusCountsRequest;
+    const results = await Promise.all(DOCUMENT_STATUS_OPTIONS.map(status =>
+        db.from("business_documents")
+            .select("id", { count: "exact", head: true })
+            .eq("organization_id", currentOrganizationId)
+            .eq("status", status)
+    ));
+    if (requestId !== documentStatusCountsRequest) return;
+    const failed = results.some(result => result.error);
+    if (failed) {
+        console.warn("تعذر تحديث مؤشرات الحالات من قاعدة البيانات.", results.filter(result => result.error).map(result => result.error));
+        DOCUMENT_STATUS_OPTIONS.forEach(status => { documentStatusCounts[status] = null; });
+    } else {
+        DOCUMENT_STATUS_OPTIONS.forEach((status, index) => {
+            documentStatusCounts[status] = Number(results[index].count || 0);
+        });
+    }
+    renderStatusIndicators();
+}
+function applyStatusChipFilter(status) {
+    const field = $("filter-status");
+    if (!field) return;
+    const clearSelection = field.value === status;
+    field.value = clearSelection ? "" : status;
+    /* المؤشر يطلب كل مستندات هذه الحالة في الشركة، لا نتائج البحث أو الصفحة الحالية فقط. */
+    $("search-text").value = "";
+    $("filter-type").value = "";
+    $("filter-day").value = "";
+    $("filter-month").value = "";
+    $("filter-year").value = "";
+    activeQuickFilter = "";
+    document.querySelectorAll("[data-quick-filter]").forEach(button => button.classList.remove("active"));
+    currentPage = 0;
+    $("filter-message").textContent = field.value
+        ? `يعرض الآن جميع مستندات الشركة ذات الحالة: ${field.value}`
+        : "تم إلغاء تصفية الحالة وعرض المستندات وفق حجم الصفحة المحدد";
+    loadDocuments();
+}
 /* عرض البطاقات */
 function renderCards() {
+    renderStatusIndicators();
     if (!currentDocuments.length) {
         $("cards").innerHTML =
             `<div class="empty">
@@ -4047,13 +4037,15 @@ function renderCards() {
     $("cards").innerHTML =
         currentDocuments.map(document => {
 
-            const statusClass =
-                document.status === "قيد المراجعة"
-                    ? "status-review"
-                    : document.status === "مغلق" ||
-                      document.status === "ملغي"
-                        ? "status-closed"
-                        : "";
+            const statusClasses = {
+                "مفتوح": ["status-open", "card-open"],
+                "قيد المراجعة": ["status-review", "card-review"],
+                "ساري": ["status-valid", "card-valid"],
+                "مغلق": ["status-closed", "card-closed"],
+                "ملغي": ["status-cancelled", "card-cancelled"]
+            };
+            const [statusClass, cardStatusClass] =
+                statusClasses[document.status] || ["", ""];
 
             const createdTime =
                 document.created_at
@@ -4072,8 +4064,8 @@ function renderCards() {
             const formatNumber = value => {
                 const number = Number(value || 0);
                 return Number.isFinite(number)
-                    ? number.toLocaleString("ar-EG", { minimumFractionDigits: 2 })
-                    : "0.00";
+                    ? formatArabicNumber(number, 2, 2)
+                    : "٠٫٠٠";
             };
 
             const finalTotal = items.length
@@ -4087,7 +4079,7 @@ function renderCards() {
                 : Number(document.amount || 0);
 
             return `
-                <article class="card">
+                <article class="card ${cardStatusClass}">
 
                     <div class="card-header">
                         <div>
@@ -4151,7 +4143,7 @@ function renderCards() {
                                             <tr>
                                                 <td class="card-item-index">${index + 1}</td>
                                                 <td>${escapeHtml(item.name || "—")}</td>
-                                                <td class="card-item-quantity">${escapeHtml(item.quantity ?? 0)}</td>
+                                                <td class="card-item-quantity">${formatArabicNumber(item.quantity ?? 0, 0, 6)}</td>
                                                 <td class="card-item-price">${formatNumber(item.price)}</td>
                                                 <td class="card-item-total">${formatNumber(lineTotal)}</td>
                                             </tr>
@@ -4344,7 +4336,9 @@ function startEditDocument(documentId) {
         record.status || "مفتوح";
 
     $("amount").value =
-        record.amount ?? "";
+        record.amount === null || record.amount === undefined
+            ? ""
+            : arabicDigitInput(record.amount);
 
     $("period-from").value =
         record.period_from || "";
@@ -4369,8 +4363,13 @@ function startEditDocument(documentId) {
     $("intro-title").value = introData.title;
     $("intro-title-style").value = introData.titleStyle;
     $("intro-title-size").value = introData.titleSize;
+    $("intro-title-align").value = introData.titleAlign;
     $("intro-text").value = introData.text;
-    $("conclusion-text").value = record.conclusion_text || "";
+    const conclusionData = parseConclusionText(record.conclusion_text);
+    $("conclusion-text").value = conclusionData.text;
+    $("conclusion-align").value = conclusionData.align;
+    $("conclusion-style").value = conclusionData.style;
+    $("conclusion-size").value = conclusionData.size;
     $("footer-right").value = record.footer_right || "";
     $("footer-center").value = record.footer_center || record.footer_text || "";
     $("footer-left").value = record.footer_left || "";
@@ -4580,7 +4579,7 @@ async function runSmartReview() {
     const entity = $("entity-name").value.trim();
     const documentNumber = $("document-number").value.trim();
     const sourceUrl = $("source-url").value.trim();
-    const enteredAmount = Number($("amount").value);
+    const enteredAmount = parseLocalizedNumber($("amount").value);
 
     if (!entity) issues.push({type:"critical", title:"اسم الجهة ناقص", text:"اكتب اسم العميل أو الجهة قبل الحفظ."});
     if (!documentNumber) issues.push({type:"warning", title:"الرقم الداخلي غير موجود", text:"يمكن الحفظ بدونه، لكن وجوده يسهل البحث ومنع التكرار."});
@@ -4706,9 +4705,15 @@ if (!currentOrganizationId) {
             title: $("intro-title").value.trim(),
             titleStyle: $("intro-title-style").value,
             titleSize: $("intro-title-size").value,
+            titleAlign: $("intro-title-align").value,
             text: $("intro-text").value.trim()
         }),
-        conclusion_text: $("conclusion-text").value.trim() || null,
+        conclusion_text: serializeConclusionText({
+            text: $("conclusion-text").value,
+            align: $("conclusion-align").value,
+            style: $("conclusion-style").value,
+            size: $("conclusion-size").value
+        }),
         footer_text: null,
         footer_align: "center",
         footer_right: $("footer-right").value.trim() || null,
@@ -4785,6 +4790,10 @@ function clearForm() {
     if ($("header-center-style")) $("header-center-style").value = "bold";
     if ($("intro-title-style")) $("intro-title-style").value = "normal";
     if ($("intro-title-size")) $("intro-title-size").value = "normal";
+    if ($("intro-title-align")) $("intro-title-align").value = "right";
+    if ($("conclusion-align")) $("conclusion-align").value = "right";
+    if ($("conclusion-style")) $("conclusion-style").value = "bold";
+    if ($("conclusion-size")) $("conclusion-size").value = "normal";
     $("amount").value = "";
     $("document-date").value = todayDate();
     setItemsEditor();
@@ -4831,13 +4840,14 @@ function parseIntroText(value) {
                 title: typeof data.title === "string" ? data.title : "",
                 titleStyle: ["normal", "bold", "underline", "bold-underline"].includes(data.titleStyle) ? data.titleStyle : "normal",
                 titleSize: data.titleSize === "large" ? "large" : "normal",
+                titleAlign: ["right", "center", "left"].includes(data.titleAlign) ? data.titleAlign : "right",
                 text: typeof data.text === "string" ? data.text : ""
             };
         } catch (error) {
             console.warn("تعذر قراءة تنسيق المقدمة؛ سيُعرض النص كما هو.", error);
         }
     }
-    return { title: "", titleStyle: "normal", titleSize: "normal", text: raw };
+    return { title: "", titleStyle: "normal", titleSize: "normal", titleAlign: "right", text: raw };
 }
 function serializeIntroText(data) {
     const title = String(data.title || "").trim();
@@ -4847,7 +4857,37 @@ function serializeIntroText(data) {
         title,
         titleStyle: ["normal", "bold", "underline", "bold-underline"].includes(data.titleStyle) ? data.titleStyle : "normal",
         titleSize: data.titleSize === "large" ? "large" : "normal",
+        titleAlign: ["right", "center", "left"].includes(data.titleAlign) ? data.titleAlign : "right",
         text
+    });
+}
+
+const CONCLUSION_TEXT_PREFIX = "[[CONCLUSION_FORMAT_V1]]";
+function parseConclusionText(value) {
+    const raw = String(value || "");
+    if (raw.startsWith(CONCLUSION_TEXT_PREFIX)) {
+        try {
+            const data = JSON.parse(raw.slice(CONCLUSION_TEXT_PREFIX.length));
+            return {
+                text: typeof data.text === "string" ? data.text : "",
+                align: ["right", "center", "left"].includes(data.align) ? data.align : "right",
+                style: ["normal", "bold", "underline", "bold-underline"].includes(data.style) ? data.style : "bold",
+                size: data.size === "large" ? "large" : "normal"
+            };
+        } catch (error) {
+            console.warn("تعذر قراءة تنسيق الخاتمة؛ سيُعرض النص كما هو.", error);
+        }
+    }
+    return { text: raw, align: "right", style: "bold", size: "normal" };
+}
+function serializeConclusionText(data) {
+    const text = String(data.text || "").trim();
+    if (!text) return null;
+    return CONCLUSION_TEXT_PREFIX + JSON.stringify({
+        text,
+        align: ["right", "center", "left"].includes(data.align) ? data.align : "right",
+        style: ["normal", "bold", "underline", "bold-underline"].includes(data.style) ? data.style : "bold",
+        size: data.size === "large" ? "large" : "normal"
     });
 }
 
@@ -4874,10 +4914,8 @@ function openDetails(id) {
     const formatNumber = value => {
         const number = Number(value || 0);
         return Number.isFinite(number)
-            ? number.toLocaleString("ar-EG", {
-                minimumFractionDigits: 2
-            })
-            : "0.00";
+            ? formatArabicNumber(number, 2, 2)
+            : "٠٫٠٠";
     };
 
     const finalTotal = items.length
@@ -4966,7 +5004,7 @@ function openDetails(id) {
                 </div>
             </section>
 
-            ${record.intro_text ? (() => { const intro = parseIntroText(record.intro_text); return `<div class="print-intro">${intro.title ? `<strong class="print-intro-title" style="${normalizeTextStyle(intro.titleStyle)}${intro.titleSize === "large" ? "font-size:1.25em;" : ""}">${escapeHtml(intro.title)}</strong>` : ""}${intro.text ? `<div>${escapeHtml(intro.text)}</div>` : ""}</div>`; })() : ""}
+            ${record.intro_text ? (() => { const intro = parseIntroText(record.intro_text); return `<div class="print-intro">${intro.title ? `<strong class="print-intro-title" style="text-align:${["right", "center", "left"].includes(intro.titleAlign) ? intro.titleAlign : "right"};${normalizeTextStyle(intro.titleStyle)}${intro.titleSize === "large" ? "font-size:1.25em;" : ""}">${escapeHtml(intro.title)}</strong>` : ""}${intro.text ? `<div>${escapeHtml(intro.text)}</div>` : ""}</div>`; })() : ""}
 
             <section class="details-section">
                 <h3 class="details-section-title">تفاصيل البنود المالية</h3>
@@ -4994,7 +5032,7 @@ function openDetails(id) {
                                             <tr>
                                                 <td class="item-index">${index + 1}</td>
                                                 <td>${escapeHtml(item.name || "—")}</td>
-                                                <td class="item-quantity">${escapeHtml(item.quantity ?? 0)}</td>
+                                                <td class="item-quantity">${formatArabicNumber(item.quantity ?? 0, 0, 6)}</td>
                                                 <td class="item-price">${formatNumber(item.price)}</td>
                                                 <td class="item-total">${formatNumber(lineTotal)}</td>
                                             </tr>
@@ -5054,7 +5092,7 @@ function openDetails(id) {
                 </div>
             </section>
 
-            ${record.conclusion_text ? `<div class="print-conclusion">${escapeHtml(record.conclusion_text)}</div>` : ""}
+            ${record.conclusion_text ? (() => { const conclusion = parseConclusionText(record.conclusion_text); const style = conclusion.style === "normal" ? "font-weight:400;text-decoration:none;" : normalizeTextStyle(conclusion.style); return conclusion.text ? `<div class="print-conclusion" style="text-align:${normalizeTextAlign(conclusion.align)};${style}${conclusion.size === "large" ? "font-size:1.2em;" : ""}">${escapeHtml(conclusion.text)}</div>` : ""; })() : ""}
             ${hasFooterParts ? `
                 <div class="print-footer print-three-parts">
                     <div style="${normalizeTextStyle(record.footer_right_style)}">${escapeHtml(footerRight)}</div>
@@ -5380,70 +5418,63 @@ async function loadOrganizationMembers() {
 
     list.innerHTML =
         result.data.map(member => `
-            <div
-                style="
-                    padding:10px 0;
-                    border-bottom:1px solid #e5e7eb;
-                    display:flex;
-                    justify-content:space-between;
-                    gap:10px;
-                    font-size:.85rem;
-                "
-            >
-                <span>
-                    ${escapeHtml(
-                        member.member_email
-                    )}
-                </span>
-
-                
-    <div style="text-align:left;">
-    <b style="color:#17324d;">
-        ${
-            member.member_role === "owner"
-                ? "مالك الشركة"
-                : member.member_role === "admin"
-                    ? "مدير"
-                    : "موظف"
-        }
-    </b>
-
-    
-</div>
-
-
-    ${
-        member.member_role === "member"
-            ? `
-                <label
-                    style="
-                        display:block;
-                        margin-top:6px;
-                        font-size:.72rem;
-                        color:#6b7280;
-                        cursor:pointer;
-                    "
-                >
-                    <input
-                        type="checkbox"
-                        class="member-delete-permission"
-                        data-member-id="${member.member_user_id}"
-                        ${
-                            member.member_can_delete
-
-                                ? "checked"
-                                : ""
-                        }
-                    >
-                    السماح بالحذف
-                </label>
-              `
-            : ""
-    }
-</div>
-
+            <div style="padding:10px 0;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:.85rem;flex-wrap:wrap;">
+                <span style="overflow-wrap:anywhere;">${escapeHtml(member.member_email)}</span>
+                <div style="text-align:left;">
+                    <b style="color:#17324d;">
+                        ${member.member_role === "owner" ? "مالك الشركة" : member.member_role === "admin" ? "مدير" : "موظف"}
+                    </b>
+                    ${member.member_role === "member" ? `
+                        <label style="display:block;margin-top:6px;font-size:.72rem;color:#6b7280;cursor:pointer;">
+                            <input type="checkbox" class="member-delete-permission" data-member-id="${member.member_user_id}" ${member.member_can_delete ? "checked" : ""}>
+                            السماح بالحذف
+                        </label>
+                    ` : ""}
+                    ${member.member_role !== "owner" && (currentOrganizationRole === "owner" || member.member_role === "member") ? `
+                        <button type="button" class="remove-organization-member-button" data-member-id="${member.member_user_id}" data-member-email="${escapeHtml(member.member_email)}" style="margin-top:7px;border:1px solid #f0b8b3;border-radius:7px;padding:6px 9px;background:#fff5f4;color:#b42318;font-size:.75rem;font-weight:bold;">
+                            إزالة من الشركة
+                        </button>
+                    ` : ""}
+                </div>
             </div>
         `).join("");
+
+    document.querySelectorAll(".remove-organization-member-button").forEach(function (button) {
+        button.addEventListener("click", async function () {
+            const memberId = button.dataset.memberId;
+            const memberEmail = button.dataset.memberEmail || "هذا العضو";
+            const confirmed = window.confirm(
+                `هل تريد إزالة ${memberEmail} من شركتك؟\n\nسيُزال وصوله إلى الشركة فقط. لن يُحذف حسابه أو أي مستند أو بيانات محفوظة.`
+            );
+            if (!confirmed) return;
+
+            const message = document.getElementById("employees-window-message");
+            button.disabled = true;
+            if (message) {
+                message.style.color = "#a76500";
+                message.textContent = "جارٍ إزالة عضوية الموظف فقط...";
+            }
+
+            try {
+                const removalResult = await db.rpc("remove_organization_member", {
+                    p_member_user_id: memberId
+                });
+                if (removalResult.error) throw removalResult.error;
+                if (message) {
+                    message.style.color = "#16845b";
+                    message.textContent = "تمت إزالة العضوية. بقي حساب الموظف ومستندات الشركة محفوظة.";
+                }
+                await loadOrganizationMembers();
+            } catch (error) {
+                console.error(error);
+                button.disabled = false;
+                if (message) {
+                    message.style.color = "#b42318";
+                    message.textContent = "لم تتم إزالة العضوية: " + (error.message || "حدث خطأ غير متوقع");
+                }
+            }
+        });
+    });
 document
     .querySelectorAll(
         ".member-delete-permission"
