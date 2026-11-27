@@ -123,6 +123,20 @@ textarea {
     background: white;
     color: var(--text);
 }
+.panel input:not([type="checkbox"]):not([type="radio"]), .panel select, .panel textarea {
+    background-color:#f2f7ff;
+    border-color:#c7d5e6;
+    transition:background-color .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+.panel textarea { background-color:#fffaf0; }
+.panel input:focus, .panel select:focus, .panel textarea:focus {
+    outline:none;
+    background-color:#fff;
+    border-color:#3977c3;
+    box-shadow:0 0 0 3px rgba(57,119,195,.16);
+}
+.search-help { display:block; margin-top:6px; color:#526176; font-size:.75rem; line-height:1.6; }
+
 
 textarea {
     min-height: 70px;
@@ -170,18 +184,45 @@ button {
 }
 
 .card {
-    background: white;
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 16px;
-    box-shadow: 0 4px 15px #17324d12;
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    min-width:0;
+    background:#fff;
+    border:1px solid #dce4ee;
+    border-right-width:8px;
+    border-radius:16px;
+    padding:18px;
+    box-shadow:0 5px 16px rgba(24,46,72,.09);
+    transition:transform .16s ease, box-shadow .16s ease, border-color .16s ease;
 }
-
+.card:hover {
+    transform:translateY(-3px);
+    box-shadow:0 11px 26px rgba(24,46,72,.16);
+}
 .card-header {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+    padding-bottom:12px;
+    border-bottom:1px solid rgba(38,55,77,.12);
 }
+.card .document-type { line-height:1.5; }
+.card .document-number { display:inline-block; margin-top:7px; padding:3px 8px; border-radius:6px; background:rgba(255,255,255,.78); color:#3f4d60; }
+.card .status { padding:6px 10px; font-weight:700; letter-spacing:.01em; box-shadow:0 1px 2px rgba(0,0,0,.08); }
+.card-data { gap:12px; }
+.card-data > div { min-width:0; padding:9px 10px; border:1px solid rgba(38,55,77,.08); border-radius:10px; background:rgba(255,255,255,.72); overflow-wrap:anywhere; }
+.card-data span { color:#526176; font-weight:600; }
+.card .amount { color:#143c72; }
+.card .details-button { margin-top:auto; }
+.card.card-open { border-right-color:#2563eb; background:#eaf2ff; }
+.card.card-review { border-right-color:#c77700; background:#fff4db; }
+.card.card-valid { border-right-color:#218347; background:#e8f5e9; }
+.card.card-closed { border-right-color:#667085; background:#edf0f4; }
+.card.card-cancelled { border-right-color:#c62828; background:#fdebec; }
+@media (prefers-reduced-motion:reduce) { .card { transition:none; } .card:hover { transform:none; } }
+@media print { .card { box-shadow:none; transform:none; } }
 
 .document-type {
     color: var(--navy);
@@ -2485,10 +2526,13 @@ dialog#analytics-dialog[open] .analytics-modal {
     <div class="form-grid">
 
         <div class="full-width">
-            <label>بحث</label>
+            <label for="search-text">بحث في قاعدة البيانات</label>
             <input
                 id="search-text"
-                placeholder="رقم المستند أو الجهة أو الملاحظات">
+                type="search"
+                autocomplete="off"
+                placeholder="اكتب رقم المستند أو اسم الجهة أو نوع المستند أو الحالة أو كلمة من الملاحظات">
+            <small class="search-help">يعمل البحث مع فلاتر النوع والحالة والتاريخ أدناه، ويبحث في جميع سجلات الشركة بقاعدة البيانات لا في الصفحة الحالية فقط. انتظر لحظة قصيرة بعد الكتابة أو اضغط Enter.</small>
         </div>
 
         <div>
@@ -2589,6 +2633,7 @@ dialog#analytics-dialog[open] .analytics-modal {
     <p class="status-summary-note">ألوان الحالات وإجمالي عدد مستندات كل حالة في قاعدة البيانات لهذه الشركة — اضغط على الحالة لعرض جميع مستنداتها.</p>
     <div id="document-status-summary" class="status-summary" role="group" aria-label="تصفية المستندات حسب الحالة"></div>
 </div>
+
 <section id="cards" class="cards">
     <div class="empty">جاري التحميل...</div>
 </section>
@@ -2740,6 +2785,7 @@ const db = supabase.createClient(
 
 let currentPage = 0;
 let totalDocuments = 0;
+let documentsLoadRequestId = 0;
 let currentDocuments = [];
 let currentOrganizationId = null;
 let currentOrganizationRole = null;
@@ -3480,11 +3526,20 @@ function buildQuery() {
         $("filter-year").value;
 
     if (search) {
-        query = query.or(
-            `document_number.ilike.%${search}%,
-             entity_name.ilike.%${search}%,
-             notes.ilike.%${search}%`
-        );
+        const safeSearch = search.replace(/[(),%\"\\]/g, " ").replace(/\s+/g, " ").trim();
+        if (safeSearch) {
+            const terms = [safeSearch];
+            if (/^[0-9٠-٩۰-۹]+$/.test(safeSearch)) {
+                const western = safeSearch.replace(/[٠-٩]/g, digit => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)))
+                    .replace(/[۰-۹]/g, digit => String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit)));
+                const arabic = western.replace(/[0-9]/g, digit => "٠١٢٣٤٥٦٧٨٩"[Number(digit)]);
+                if (!terms.includes(western)) terms.push(western);
+                if (!terms.includes(arabic)) terms.push(arabic);
+            }
+            const searchableColumns = ["document_number", "entity_name", "document_type", "status", "notes"];
+            const searchFilters = terms.flatMap(term => searchableColumns.map(column => `${column}.ilike.%${term}%`));
+            query = query.or(searchFilters.join(","));
+        }
     }
 
     if (type) {
@@ -3543,6 +3598,7 @@ function buildQuery() {
 
 /* تحميل صفحة واحدة فقط */
 async function loadDocuments() {
+    const requestId = ++documentsLoadRequestId;
     const pageSize =
         Number($("page-size").value);
 
@@ -3555,6 +3611,7 @@ async function loadDocuments() {
     const result =
         await buildQuery().range(start, end);
 
+    if (requestId !== documentsLoadRequestId) return;
     if (result.error) {
         $("cards").innerHTML =
             `<div class="empty">
@@ -3954,6 +4011,7 @@ async function updateDocumentStatus(documentId, newStatus) {
     const result = await db.from("business_documents").update({ status: newStatus }).eq("id", documentId).eq("organization_id", currentOrganizationId);
     if (result.error) { alert("فشل تغيير الحالة: " + result.error.message); renderCards(); return; }
     followupSummaryCache = null;
+    lastDocumentStatusCountsAt = 0;
     await loadDocuments();
     refreshFollowupSummary(true);
     loadTodayOperations(true);
@@ -3963,6 +4021,7 @@ async function updateDocumentStatus(documentId, newStatus) {
 const DOCUMENT_STATUS_OPTIONS = ["مفتوح", "قيد المراجعة", "ساري", "مغلق", "ملغي"];
 const documentStatusCounts = Object.fromEntries(DOCUMENT_STATUS_OPTIONS.map(status => [status, null]));
 let documentStatusCountsRequest = 0;
+let lastDocumentStatusCountsAt = 0;
 function renderStatusIndicators() {
     const container = $("document-status-summary");
     if (!container) return;
@@ -3983,8 +4042,9 @@ function renderStatusIndicators() {
         button.addEventListener("click", () => applyStatusChipFilter(button.dataset.status));
     });
 }
-async function refreshDocumentStatusCounts() {
+async function refreshDocumentStatusCounts(force = false) {
     if (!currentOrganizationId) return;
+    if (!force && Date.now() - lastDocumentStatusCountsAt < 60000) return;
     const requestId = ++documentStatusCountsRequest;
     const results = await Promise.all(DOCUMENT_STATUS_OPTIONS.map(status =>
         db.from("business_documents")
@@ -3997,14 +4057,17 @@ async function refreshDocumentStatusCounts() {
     if (failed) {
         console.warn("تعذر تحديث مؤشرات الحالات من قاعدة البيانات.", results.filter(result => result.error).map(result => result.error));
         DOCUMENT_STATUS_OPTIONS.forEach(status => { documentStatusCounts[status] = null; });
+        lastDocumentStatusCountsAt = Date.now();
     } else {
         DOCUMENT_STATUS_OPTIONS.forEach((status, index) => {
             documentStatusCounts[status] = Number(results[index].count || 0);
         });
+        lastDocumentStatusCountsAt = Date.now();
     }
     renderStatusIndicators();
 }
 function applyStatusChipFilter(status) {
+    clearTimeout(quickSearchTimer);
     const field = $("filter-status");
     if (!field) return;
     const clearSelection = field.value === status;
@@ -5123,6 +5186,7 @@ function applyFilters() {
 
 /* عرض كل المستندات مع بقاء التقسيم */
 function showAllDocuments() {
+    clearTimeout(quickSearchTimer);
     activeQuickFilter = "all";
     document.querySelectorAll("[data-quick-filter]").forEach(button => button.classList.remove("active"));
     $("search-text").value = "";
@@ -5148,14 +5212,24 @@ function changePage(number) {
     loadDocuments();
 }
 
-/* تفعيل البحث وتغيير حجم الصفحة */
-$("search-text").addEventListener(
-    "input",
-    () => {
+/* البحث الموحد: طلب واحد إلى قاعدة البيانات بعد توقف الكتابة، أو فور الضغط على Enter. */
+let databaseSearchTimer = null;
+function scheduleDatabaseSearch(immediate = false) {
+    clearTimeout(databaseSearchTimer);
+    const runSearch = () => {
         currentPage = 0;
         loadDocuments();
+    };
+    if (immediate) runSearch();
+    else databaseSearchTimer = setTimeout(runSearch, 600);
+}
+$("search-text").addEventListener("input", () => scheduleDatabaseSearch());
+$("search-text").addEventListener("keydown", event => {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        scheduleDatabaseSearch(true);
     }
-);
+});
 
 $("page-size").addEventListener(
     "change",
